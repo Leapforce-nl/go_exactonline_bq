@@ -8,13 +8,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	exactonline "github.com/Leapforce-nl/exactonline_bq2/exactonline"
 	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	salesorder "github.com/Leapforce-nl/go_exactonline2/salesorder"
+	salesorder "github.com/Leapforce-nl/go_exactonline_new/salesorder"
 )
-
-type GoodsDeliveries struct {
-}
 
 type GoodsDeliveryBQ struct {
 	ClientID                      string
@@ -83,59 +79,72 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 	}
 }
 
-func (_ *GoodsDeliveries) Table() *exactonline.Table {
-	return exactonline.NewTable(
-		"salesorder_goodsdeliveries",
-		"salesorder_goodsdeliveries",
-		GoodsDeliveryBQ{})
-}
-
-func (_ *GoodsDeliveries) GetDataAndWriteToBucket(bq *bigquerytools.BigQuery, obj *storage.ObjectHandle, client *exactonline.Client) (int, error) {
-	if client == nil {
-		return 0, nil
-	}
-
-	ctx := context.Background()
-
-	w := obj.NewWriter(ctx)
-
-	gds, err := client.ExactOnline.SalesOrderClient.GetGoodsDeliveries()
+func (client *Client) GetGoodsDeliveriesBQ() (*[]GoodsDeliveryBQ, error) {
+	gds, err := client.ExactOnline().SalesOrderClient.GetGoodsDeliveries()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if gds == nil {
-		return 0, nil
+		return nil, nil
 	}
 
 	rowCount := len(*gds)
 
-	fmt.Printf("#GoodsDeliveries for client %s: %v\n", client.ClientID, rowCount)
+	fmt.Printf("#GoodsDeliveries for client %s: %v\n", client.ClientID(), rowCount)
 
-	for _, a := range *gds {
-		b, err := json.Marshal(getGoodsDeliveryBQ(&a, client.ClientID))
+	gdsBQ := []GoodsDeliveryBQ{}
+
+	for _, gd := range *gds {
+		gdsBQ = append(gdsBQ, getGoodsDeliveryBQ(&gd, client.ClientID()))
+	}
+
+	return &gdsBQ, nil
+}
+
+func (client *Client) WriteGoodsDeliveriesBQ(writeToObject *storage.ObjectHandle) (interface{}, error) {
+	if writeToObject == nil {
+		return nil, nil
+	}
+
+	gdsBQ, err := client.GetGoodsDeliveriesBQ()
+	if err != nil {
+		return nil, err
+	}
+
+	if gdsBQ == nil {
+		return nil, nil
+	}
+
+	ctx := context.Background()
+
+	w := writeToObject.NewWriter(ctx)
+
+	for _, gdBQ := range *gdsBQ {
+
+		b, err := json.Marshal(gdBQ)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 
 		// Write data
 		_, err = w.Write(b)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 
 		// Write NewLine
 		_, err = fmt.Fprintf(w, "\n")
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 	}
 
 	// Close
 	err = w.Close()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return rowCount, nil
+	return GoodsDeliveryBQ{}, nil
 }
