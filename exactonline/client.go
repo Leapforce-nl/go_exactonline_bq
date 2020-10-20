@@ -1,4 +1,4 @@
-package exactonline_bq2
+package exactonline_bq
 
 import (
 	exactonline "github.com/Leapforce-nl/go_exactonline2"

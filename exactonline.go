@@ -1,4 +1,4 @@
-package exactonline_bq2
+package exactonline_bq
 
 import (
 	salesorder "github.com/Leapforce-nl/exactonline_bq2/salesorder"
