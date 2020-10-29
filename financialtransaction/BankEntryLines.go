@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -110,8 +111,8 @@ func getBankEntryLineBQ(c *financialtransaction.BankEntryLine, clientID string) 
 	}
 }
 
-func (client *Client) GetBankEntryLinesBQ() (*[]BankEntryLineBQ, error) {
-	gds, err := client.ExactOnline().FinancialTransactionClient.GetBankEntryLines()
+func (client *Client) GetBankEntryLinesBQ(lastModified *time.Time) (*[]BankEntryLineBQ, error) {
+	gds, err := client.ExactOnline().FinancialTransactionClient.GetBankEntryLines(lastModified)
 	if err != nil {
 		return nil, err
 	}
@@ -133,18 +134,18 @@ func (client *Client) GetBankEntryLinesBQ() (*[]BankEntryLineBQ, error) {
 	return &gdsBQ, nil
 }
 
-func (client *Client) WriteBankEntryLinesBQ(writeToObject *storage.ObjectHandle) (interface{}, error) {
+func (client *Client) WriteBankEntryLinesBQ(writeToObject *storage.ObjectHandle, lastModified *time.Time) (int, interface{}, error) {
 	if writeToObject == nil {
-		return nil, nil
+		return 0, nil, nil
 	}
 
-	gdsBQ, err := client.GetBankEntryLinesBQ()
+	gdsBQ, err := client.GetBankEntryLinesBQ(lastModified)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	if gdsBQ == nil {
-		return nil, nil
+		return 0, nil, nil
 	}
 
 	ctx := context.Background()
@@ -155,27 +156,27 @@ func (client *Client) WriteBankEntryLinesBQ(writeToObject *storage.ObjectHandle)
 
 		b, err := json.Marshal(gdBQ)
 		if err != nil {
-			return nil, err
+			return 0, nil, err
 		}
 
 		// Write data
 		_, err = w.Write(b)
 		if err != nil {
-			return nil, err
+			return 0, nil, err
 		}
 
 		// Write NewLine
 		_, err = fmt.Fprintf(w, "\n")
 		if err != nil {
-			return nil, err
+			return 0, nil, err
 		}
 	}
 
 	// Close
 	err = w.Close()
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
-	return BankEntryLineBQ{}, nil
+	return len(*gdsBQ), BankEntryLineBQ{}, nil
 }
