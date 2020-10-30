@@ -124,6 +124,8 @@ github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030001858-c8ed1ae91ca2 h1
 github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030001858-c8ed1ae91ca2/go.mod h1:i/DcrBP4XgbGQ4VxV0NsBD5HpRX8t3QHo3MUsAzg7Mk=
 github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030003009-eae000901784 h1:3P/jL16hxHXYr7MK1HHAtqOs5F+9c1zqyll0/uqhd1M=
 github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030003009-eae000901784/go.mod h1:i/DcrBP4XgbGQ4VxV0NsBD5HpRX8t3QHo3MUsAzg7Mk=
+github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030003333-ed2f4ffe0b13 h1:nDUFCt3/CV2RTcpheaA0fBXiseH+VgjJSePP0FC8bCA=
+github.com/Leapforce-nl/go_exactonline_new v0.0.0-20201030003333-ed2f4ffe0b13/go.mod h1:i/DcrBP4XgbGQ4VxV0NsBD5HpRX8t3QHo3MUsAzg7Mk=
 github.com/Leapforce-nl/go_oauth2 v0.0.0-20200928124310-e44ece792c88 h1:ii8qAm9NX6INLXGp9o8Gvv7nFFA7e3peF4hrJzc0Cc8=
 github.com/Leapforce-nl/go_oauth2 v0.0.0-20200928124310-e44ece792c88/go.mod h1:lI1cb81JE9c5oyOQrWINwm1qCLowa9/bCT/m/GKwU/M=
 github.com/Leapforce-nl/go_oauth2 v0.0.0-20201014173555-ff0eb96c5988 h1:359f3LxHL1qBWHqUzTpZbDaX9Q3FGfeg67pm2L8ym/A=
