@@ -11,6 +11,7 @@ import (
 
 	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
 	financialtransaction "github.com/Leapforce-nl/go_exactonline_new/financialtransaction"
+	types "github.com/Leapforce-nl/go_types"
 )
 
 type BankEntryBQ struct {
@@ -59,72 +60,85 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 	}
 }
 
-func (client *Client) GetBankEntriesBQ(lastModified *time.Time) (*[]BankEntryBQ, error) {
-	gds, err := client.ExactOnline().FinancialTransactionClient.GetBankEntries(lastModified)
-	if err != nil {
-		return nil, err
+func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, error) {
+	if bucketHandle == nil {
+		return nil, 0, nil, nil
 	}
 
-	if gds == nil {
-		return nil, nil
+	objectHandles := []*storage.ObjectHandle{}
+	var w *storage.Writer
+
+	call := client.ExactOnline().FinancialTransactionClient.NewGetBankEntriesCall(lastModified)
+
+	rowCount := 0
+	batchRowCount := 0
+	batchSize := 10000
+
+	for true {
+		bankEntries, err := call.Do()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		if bankEntries == nil {
+			break
+		}
+
+		if batchRowCount == 0 {
+			guid := types.NewGUID()
+			objectHandle := bucketHandle.Object((&guid).String())
+			objectHandles = append(objectHandles, objectHandle)
+
+			w = objectHandle.NewWriter(context.Background())
+		}
+
+		for _, tl := range *bankEntries {
+			batchRowCount++
+
+			b, err := json.Marshal(getBankEntryBQ(&tl, client.ClientID()))
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write data
+			_, err = w.Write(b)
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write NewLine
+			_, err = fmt.Fprintf(w, "\n")
+			if err != nil {
+				return nil, 0, nil, err
+			}
+		}
+
+		if batchRowCount > batchSize {
+			// Close and flush data
+			err = w.Close()
+			if err != nil {
+				return nil, 0, nil, err
+			}
+			w = nil
+
+			fmt.Printf("#BankEntries for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+
+			rowCount += batchRowCount
+			batchRowCount = 0
+		}
 	}
 
-	rowCount := len(*gds)
+	if w != nil {
+		// Close and flush data
+		err := w.Close()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		rowCount += batchRowCount
+	}
 
 	fmt.Printf("#BankEntries for client %s: %v\n", client.ClientID(), rowCount)
 
-	gdsBQ := []BankEntryBQ{}
-
-	for _, gd := range *gds {
-		gdsBQ = append(gdsBQ, getBankEntryBQ(&gd, client.ClientID()))
-	}
-
-	return &gdsBQ, nil
-}
-
-func (client *Client) WriteBankEntriesBQ(writeToObject *storage.ObjectHandle, lastModified *time.Time) (int, interface{}, error) {
-	if writeToObject == nil {
-		return 0, nil, nil
-	}
-
-	gdsBQ, err := client.GetBankEntriesBQ(lastModified)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if gdsBQ == nil {
-		return 0, nil, nil
-	}
-
-	ctx := context.Background()
-
-	w := writeToObject.NewWriter(ctx)
-
-	for _, gdBQ := range *gdsBQ {
-
-		b, err := json.Marshal(gdBQ)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write data
-		_, err = w.Write(b)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write NewLine
-		_, err = fmt.Fprintf(w, "\n")
-		if err != nil {
-			return 0, nil, err
-		}
-	}
-
-	// Close
-	err = w.Close()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	return len(*gdsBQ), BankEntryBQ{}, nil
+	return objectHandles, rowCount, BankEntryBQ{}, nil
 }

@@ -11,6 +11,7 @@ import (
 
 	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
 	budget "github.com/Leapforce-nl/go_exactonline_new/budget"
+	types "github.com/Leapforce-nl/go_types"
 )
 
 type BudgetBQ struct {
@@ -62,9 +63,9 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 		c.GLAccountCode,
 		c.GLAccountDescription,
 		c.HID,
-		c.Item.String(),
-		c.ItemCode,
-		c.ItemDescription,
+		c.Budget.String(),
+		c.BudgetCode,
+		c.BudgetDescription,
 		bigquerytools.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
@@ -73,72 +74,85 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 	}
 }
 
-func (client *Client) GetBudgetsBQ(lastModified *time.Time) (*[]BudgetBQ, error) {
-	gds, err := client.ExactOnline().BudgetClient.GetBudgets(lastModified)
-	if err != nil {
-		return nil, err
+func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, error) {
+	if bucketHandle == nil {
+		return nil, 0, nil, nil
 	}
 
-	if gds == nil {
-		return nil, nil
+	objectHandles := []*storage.ObjectHandle{}
+	var w *storage.Writer
+
+	call := client.ExactOnline().BudgetClient.NewGetBudgetsCall(lastModified)
+
+	rowCount := 0
+	batchRowCount := 0
+	batchSize := 10000
+
+	for true {
+		budgets, err := call.Do()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		if budgets == nil {
+			break
+		}
+
+		if batchRowCount == 0 {
+			guid := types.NewGUID()
+			objectHandle := bucketHandle.Object((&guid).String())
+			objectHandles = append(objectHandles, objectHandle)
+
+			w = objectHandle.NewWriter(context.Background())
+		}
+
+		for _, tl := range *budgets {
+			batchRowCount++
+
+			b, err := json.Marshal(getBudgetBQ(&tl, client.ClientID()))
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write data
+			_, err = w.Write(b)
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write NewLine
+			_, err = fmt.Fprintf(w, "\n")
+			if err != nil {
+				return nil, 0, nil, err
+			}
+		}
+
+		if batchRowCount > batchSize {
+			// Close and flush data
+			err = w.Close()
+			if err != nil {
+				return nil, 0, nil, err
+			}
+			w = nil
+
+			fmt.Printf("#Budgets for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+
+			rowCount += batchRowCount
+			batchRowCount = 0
+		}
 	}
 
-	rowCount := len(*gds)
+	if w != nil {
+		// Close and flush data
+		err := w.Close()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		rowCount += batchRowCount
+	}
 
 	fmt.Printf("#Budgets for client %s: %v\n", client.ClientID(), rowCount)
 
-	gdsBQ := []BudgetBQ{}
-
-	for _, gd := range *gds {
-		gdsBQ = append(gdsBQ, getBudgetBQ(&gd, client.ClientID()))
-	}
-
-	return &gdsBQ, nil
-}
-
-func (client *Client) WriteBudgetsBQ(writeToObject *storage.ObjectHandle, lastModified *time.Time) (int, interface{}, error) {
-	if writeToObject == nil {
-		return 0, nil, nil
-	}
-
-	gdsBQ, err := client.GetBudgetsBQ(lastModified)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if gdsBQ == nil {
-		return 0, nil, nil
-	}
-
-	ctx := context.Background()
-
-	w := writeToObject.NewWriter(ctx)
-
-	for _, gdBQ := range *gdsBQ {
-
-		b, err := json.Marshal(gdBQ)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write data
-		_, err = w.Write(b)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write NewLine
-		_, err = fmt.Fprintf(w, "\n")
-		if err != nil {
-			return 0, nil, err
-		}
-	}
-
-	// Close
-	err = w.Close()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	return len(*gdsBQ), BudgetBQ{}, nil
+	return objectHandles, rowCount, BudgetBQ{}, nil
 }

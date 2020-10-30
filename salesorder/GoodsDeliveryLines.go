@@ -11,6 +11,7 @@ import (
 
 	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
 	salesorder "github.com/Leapforce-nl/go_exactonline_new/salesorder"
+	types "github.com/Leapforce-nl/go_types"
 )
 
 type GoodsDeliveryLineBQ struct {
@@ -81,72 +82,85 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 	}
 }
 
-func (client *Client) GetGoodsDeliveryLinesBQ(lastModified *time.Time) (*[]GoodsDeliveryLineBQ, error) {
-	gds, err := client.ExactOnline().SalesOrderClient.GetGoodsDeliveryLines(lastModified)
-	if err != nil {
-		return nil, err
+func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, error) {
+	if bucketHandle == nil {
+		return nil, 0, nil, nil
 	}
 
-	if gds == nil {
-		return nil, nil
+	objectHandles := []*storage.ObjectHandle{}
+	var w *storage.Writer
+
+	call := client.ExactOnline().SalesOrderClient.NewGetGoodsDeliveryLinesCall(lastModified)
+
+	rowCount := 0
+	batchRowCount := 0
+	batchSize := 10000
+
+	for true {
+		goodsDeliveryLines, err := call.Do()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		if goodsDeliveryLines == nil {
+			break
+		}
+
+		if batchRowCount == 0 {
+			guid := types.NewGUID()
+			objectHandle := bucketHandle.Object((&guid).String())
+			objectHandles = append(objectHandles, objectHandle)
+
+			w = objectHandle.NewWriter(context.Background())
+		}
+
+		for _, tl := range *goodsDeliveryLines {
+			batchRowCount++
+
+			b, err := json.Marshal(getGoodsDeliveryLineBQ(&tl, client.ClientID()))
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write data
+			_, err = w.Write(b)
+			if err != nil {
+				return nil, 0, nil, err
+			}
+
+			// Write NewLine
+			_, err = fmt.Fprintf(w, "\n")
+			if err != nil {
+				return nil, 0, nil, err
+			}
+		}
+
+		if batchRowCount > batchSize {
+			// Close and flush data
+			err = w.Close()
+			if err != nil {
+				return nil, 0, nil, err
+			}
+			w = nil
+
+			fmt.Printf("#GoodsDeliveryLines for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+
+			rowCount += batchRowCount
+			batchRowCount = 0
+		}
 	}
 
-	rowCount := len(*gds)
+	if w != nil {
+		// Close and flush data
+		err := w.Close()
+		if err != nil {
+			return nil, 0, nil, err
+		}
+
+		rowCount += batchRowCount
+	}
 
 	fmt.Printf("#GoodsDeliveryLines for client %s: %v\n", client.ClientID(), rowCount)
 
-	gdsBQ := []GoodsDeliveryLineBQ{}
-
-	for _, gd := range *gds {
-		gdsBQ = append(gdsBQ, getGoodsDeliveryLineBQ(&gd, client.ClientID()))
-	}
-
-	return &gdsBQ, nil
-}
-
-func (client *Client) WriteGoodsDeliveryLinesBQ(writeToObject *storage.ObjectHandle, lastModified *time.Time) (int, interface{}, error) {
-	if writeToObject == nil {
-		return 0, nil, nil
-	}
-
-	gdsBQ, err := client.GetGoodsDeliveryLinesBQ(lastModified)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	if gdsBQ == nil {
-		return 0, nil, nil
-	}
-
-	ctx := context.Background()
-
-	w := writeToObject.NewWriter(ctx)
-
-	for _, gdBQ := range *gdsBQ {
-
-		b, err := json.Marshal(gdBQ)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write data
-		_, err = w.Write(b)
-		if err != nil {
-			return 0, nil, err
-		}
-
-		// Write NewLine
-		_, err = fmt.Fprintf(w, "\n")
-		if err != nil {
-			return 0, nil, err
-		}
-	}
-
-	// Close
-	err = w.Close()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	return len(*gdsBQ), GoodsDeliveryLineBQ{}, nil
+	return objectHandles, rowCount, GoodsDeliveryLineBQ{}, nil
 }
