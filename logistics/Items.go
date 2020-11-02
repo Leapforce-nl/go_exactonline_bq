@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	logistics "github.com/Leapforce-nl/go_exactonline_new/logistics"
-	types "github.com/Leapforce-nl/go_types"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
+	types "github.com/leapforce-libraries/go_types"
 )
 
 type ItemBQ struct {

@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	financialtransaction "github.com/Leapforce-nl/go_exactonline_new/financialtransaction"
-	types "github.com/Leapforce-nl/go_types"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
+	types "github.com/leapforce-libraries/go_types"
 )
 
 type BankEntryBQ struct {

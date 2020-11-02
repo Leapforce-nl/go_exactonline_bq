@@ -1,13 +1,13 @@
 package exactonline_bq
 
 import (
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	budget "github.com/Leapforce-nl/go_exactonline_bq/budget"
-	crm "github.com/Leapforce-nl/go_exactonline_bq/crm"
-	financialtransaction "github.com/Leapforce-nl/go_exactonline_bq/financialtransaction"
-	logistics "github.com/Leapforce-nl/go_exactonline_bq/logistics"
-	salesorder "github.com/Leapforce-nl/go_exactonline_bq/salesorder"
-	exactonline "github.com/Leapforce-nl/go_exactonline_new"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	budget "github.com/leapforce-libraries/go_exactonline_bq/budget"
+	crm "github.com/leapforce-libraries/go_exactonline_bq/crm"
+	financialtransaction "github.com/leapforce-libraries/go_exactonline_bq/financialtransaction"
+	logistics "github.com/leapforce-libraries/go_exactonline_bq/logistics"
+	salesorder "github.com/leapforce-libraries/go_exactonline_bq/salesorder"
+	exactonline "github.com/leapforce-libraries/go_exactonline_new"
 )
 
 type ExactOnline struct {

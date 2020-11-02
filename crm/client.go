@@ -1,7 +1,7 @@
 package exactonline_bq
 
 import (
-	eo "github.com/Leapforce-nl/go_exactonline_new"
+	eo "github.com/leapforce-libraries/go_exactonline_new"
 )
 
 type Client struct {

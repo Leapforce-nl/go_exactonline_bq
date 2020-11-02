@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	budget "github.com/Leapforce-nl/go_exactonline_new/budget"
-	types "github.com/Leapforce-nl/go_types"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	budget "github.com/leapforce-libraries/go_exactonline_new/budget"
+	types "github.com/leapforce-libraries/go_types"
 )
 
 type BudgetBQ struct {

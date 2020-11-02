@@ -1,7 +1,7 @@
 package exactonline_bq
 
 import (
-	exactonline "github.com/Leapforce-nl/go_exactonline_new"
+	exactonline "github.com/leapforce-libraries/go_exactonline_new"
 )
 
 // Client contains ClientID and Insightly APIKey of specific client

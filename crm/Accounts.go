@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	crm "github.com/Leapforce-nl/go_exactonline_new/crm"
-	types "github.com/Leapforce-nl/go_types"
+	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
+	types "github.com/leapforce-libraries/go_types"
 )
 
 type AccountBQ struct {
