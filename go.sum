@@ -281,6 +281,8 @@ github.com/leapforce-libraries/go_bigquerytools v0.0.0-20201102124458-f32e34afaa
 github.com/leapforce-libraries/go_bigquerytools v0.0.0-20201102124458-f32e34afaa2e/go.mod h1:I/IwIA/kJiTX3Gf/XZ1q45uRbF4xFZe9hK+XezrZNFg=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201102125425-33d255e68d65 h1:IJFpgJZlj4oxBeVpTO6gj2vJLcUpZEF0Djtoj/Y39TY=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201102125425-33d255e68d65/go.mod h1:xB4gU0GL9sHvJj/AsL8w5OkpRi7tH2cHib6eW+E5sP0=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201102134042-a8673a1457ad h1:hYP/24AOK/qikPOib3LTKYMW8VmkTxj6e8vO7SeqlNA=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201102134042-a8673a1457ad/go.mod h1:xB4gU0GL9sHvJj/AsL8w5OkpRi7tH2cHib6eW+E5sP0=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20201102125125-86af93eef720 h1:3G9t3STw8xSDeIIaCHhjLhAvTZ1nZXR5BYadicU/zYQ=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20201102125125-86af93eef720/go.mod h1:6ozByiRXdgkgJn42oF8bjPmHzq9Q29H8HHcu7QACNQc=
 github.com/leapforce-libraries/go_types v0.0.0-20201101222114-6d3ec3839c8c h1:4GY1e071Gyk2sBn8mMVi2rI+DUnqIUP3/IAHvND39w8=
