@@ -18,8 +18,8 @@ type ExactOnline struct {
 	SalesOrderClient           *salesorder.Client
 }
 
-func NewExactOnline(clientID string, exactOnlineClientID string, exactOnlineClientSecret string, bigQuery *bigquerytools.BigQuery, isLive bool) (*ExactOnline, error) {
-	eo, err := exactonline.NewExactOnline(exactOnlineClientID, exactOnlineClientSecret, bigQuery, isLive)
+func NewExactOnline(division int32, clientID string, exactOnlineClientID string, exactOnlineClientSecret string, bigQuery *bigquerytools.BigQuery, isLive bool) (*ExactOnline, error) {
+	eo, err := exactonline.NewExactOnline(division, exactOnlineClientID, exactOnlineClientSecret, bigQuery, isLive)
 	if err != nil {
 		return nil, err
 	}
