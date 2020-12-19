@@ -2,6 +2,7 @@ package exactonline_bq
 
 import (
 	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	errortools "github.com/leapforce-libraries/go_errortools"
 	budget "github.com/leapforce-libraries/go_exactonline_bq/budget"
 	crm "github.com/leapforce-libraries/go_exactonline_bq/crm"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_bq/financialtransaction"
@@ -18,10 +19,10 @@ type ExactOnline struct {
 	SalesOrderClient           *salesorder.Client
 }
 
-func NewExactOnline(division int32, clientID string, exactOnlineClientID string, exactOnlineClientSecret string, bigQuery *bigquerytools.BigQuery, isLive bool) (*ExactOnline, error) {
-	eo, err := exactonline.NewExactOnline(division, exactOnlineClientID, exactOnlineClientSecret, bigQuery, isLive)
-	if err != nil {
-		return nil, err
+func NewExactOnline(division int32, clientID string, exactOnlineClientID string, exactOnlineClientSecret string, bigQuery *bigquerytools.BigQuery) (*ExactOnline, *errortools.Error) {
+	eo, e := exactonline.NewExactOnline(division, exactOnlineClientID, exactOnlineClientSecret, bigQuery)
+	if e != nil {
+		return nil, e
 	}
 
 	eo_bq := ExactOnline{}

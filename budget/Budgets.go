@@ -10,6 +10,7 @@ import (
 	"cloud.google.com/go/storage"
 
 	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
+	errortools "github.com/leapforce-libraries/go_errortools"
 	budget "github.com/leapforce-libraries/go_exactonline_new/budget"
 	types "github.com/leapforce-libraries/go_types"
 )
@@ -74,7 +75,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 	}
 }
 
-func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, error) {
+func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -89,9 +90,9 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 	batchSize := 10000
 
 	for true {
-		budgets, err := call.Do()
-		if err != nil {
-			return nil, 0, nil, err
+		budgets, e := call.Do()
+		if e != nil {
+			return nil, 0, nil, e
 		}
 
 		if budgets == nil {
@@ -111,27 +112,27 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 
 			b, err := json.Marshal(getBudgetBQ(&tl, client.ClientID()))
 			if err != nil {
-				return nil, 0, nil, err
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write data
 			_, err = w.Write(b)
 			if err != nil {
-				return nil, 0, nil, err
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write NewLine
 			_, err = fmt.Fprintf(w, "\n")
 			if err != nil {
-				return nil, 0, nil, err
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 		}
 
 		if batchRowCount > batchSize {
 			// Close and flush data
-			err = w.Close()
+			err := w.Close()
 			if err != nil {
-				return nil, 0, nil, err
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 			w = nil
 
@@ -146,7 +147,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 		// Close and flush data
 		err := w.Close()
 		if err != nil {
-			return nil, 0, nil, err
+			return nil, 0, nil, errortools.ErrorMessage(err)
 		}
 
 		rowCount += batchRowCount
