@@ -71,7 +71,7 @@ func getSalesItemPriceBQ(c *logistics.SalesItemPrice, clientID string) SalesItem
 	}
 }
 
-func (client *Client) WriteSalesSalesItemPricesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -79,7 +79,7 @@ func (client *Client) WriteSalesSalesItemPricesBQ(bucketHandle *storage.BucketHa
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().LogisticsClient.NewGetSalesSalesItemPricesCall(lastModified)
+	call := client.LogisticsClient().NewGetSalesItemPricesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -132,7 +132,7 @@ func (client *Client) WriteSalesSalesItemPricesBQ(bucketHandle *storage.BucketHa
 			}
 			w = nil
 
-			fmt.Printf("#SalesSalesItemPrices for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#SalesItemPrices for client %s flushed: %v\n", client.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -149,7 +149,7 @@ func (client *Client) WriteSalesSalesItemPricesBQ(bucketHandle *storage.BucketHa
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#SalesSalesItemPrices for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#SalesItemPrices for client %s: %v\n", client.ClientID(), rowCount)
 
 	return objectHandles, rowCount, SalesItemPriceBQ{}, nil
 }

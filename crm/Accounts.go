@@ -333,7 +333,7 @@ func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastMo
 		ModifiedAfter: lastModified,
 	}
 
-	call := client.ExactOnline().CRMClient.NewGetAccountsCall(getAccountsCallParams)
+	call := client.CRMClient().NewGetAccountsCall(getAccountsCallParams)
 
 	rowCount := 0
 	batchRowCount := 0

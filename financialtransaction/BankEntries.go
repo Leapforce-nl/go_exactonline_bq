@@ -69,7 +69,7 @@ func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, las
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().FinancialTransactionClient.NewGetBankEntriesCall(lastModified)
+	call := client.FinancialTransactionClient().NewGetBankEntriesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0

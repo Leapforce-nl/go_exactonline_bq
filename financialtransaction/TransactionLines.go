@@ -169,7 +169,7 @@ func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().FinancialTransactionClient.NewGetTransactionLinesCall(lastModified)
+	call := client.FinancialTransactionClient().NewGetTransactionLinesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0

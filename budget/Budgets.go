@@ -83,7 +83,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().BudgetClient.NewGetBudgetsCall(lastModified)
+	call := client.BudgetClient().NewGetBudgetsCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0

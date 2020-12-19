@@ -143,7 +143,7 @@ func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastM
 		ModifiedAfter: lastModified,
 	}
 
-	call := client.ExactOnline().CRMClient.NewGetAddressesCall(getAddressesCallparams)
+	call := client.CRMClient().NewGetAddressesCall(getAddressesCallparams)
 
 	rowCount := 0
 	batchRowCount := 0

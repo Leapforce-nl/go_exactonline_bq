@@ -316,6 +316,12 @@ github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219141318-69a3eb42
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219141318-69a3eb42c3ff/go.mod h1:ZDxOyi6FI93ao8v1T8GwYBSyE9wD1k8tCjVdEC6/4i8=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219142400-44d9a50c1494 h1:y9Ih6g6HBtTUT8wqvOnQTqa3pBLUr0uQwLj22nG3IOg=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219142400-44d9a50c1494/go.mod h1:ZDxOyi6FI93ao8v1T8GwYBSyE9wD1k8tCjVdEC6/4i8=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219165934-a456ed319a32 h1:gH8Cnq9CtEMlUPokBjFAXH1Ri8Q4XC0C1qByg6/hZ7M=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219165934-a456ed319a32/go.mod h1:ZDxOyi6FI93ao8v1T8GwYBSyE9wD1k8tCjVdEC6/4i8=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219171718-3406a943db5b h1:bCFUYSe0n5LyvscvnfO92hMiHkbCeMaxTnx9duz4Om0=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219171718-3406a943db5b/go.mod h1:ZDxOyi6FI93ao8v1T8GwYBSyE9wD1k8tCjVdEC6/4i8=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219172452-e33e6ed797fe h1:d/AscGlpfwS6n1GVAVIwJmlZ0E5oGo6BgVfJXzFBQtk=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201219172452-e33e6ed797fe/go.mod h1:ZDxOyi6FI93ao8v1T8GwYBSyE9wD1k8tCjVdEC6/4i8=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20201102125125-86af93eef720 h1:3G9t3STw8xSDeIIaCHhjLhAvTZ1nZXR5BYadicU/zYQ=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20201102125125-86af93eef720/go.mod h1:6ozByiRXdgkgJn42oF8bjPmHzq9Q29H8HHcu7QACNQc=
 github.com/leapforce-libraries/go_oauth2 v0.0.0-20201204165338-82d7c2ae8b56 h1:35SXXSW/cOIUhPshUDsqgX+AprIIT+1832c5YOYue/U=

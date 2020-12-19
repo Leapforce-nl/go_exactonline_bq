@@ -91,7 +91,7 @@ func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHand
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().SalesOrderClient.NewGetGoodsDeliveryLinesCall(lastModified)
+	call := client.SalesOrderClient().NewGetGoodsDeliveryLinesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0

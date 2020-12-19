@@ -229,7 +229,7 @@ func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModif
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.ExactOnline().LogisticsClient.NewGetItemsCall(lastModified)
+	call := client.LogisticsClient().NewGetItemsCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
