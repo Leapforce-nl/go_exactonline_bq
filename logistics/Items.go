@@ -20,16 +20,16 @@ type ItemBQ struct {
 	ID                      string
 	AverageCost             float64
 	Barcode                 string
-	Class_01                string
-	Class_02                string
-	Class_03                string
-	Class_04                string
-	Class_05                string
-	Class_06                string
-	Class_07                string
-	Class_08                string
-	Class_09                string
-	Class_10                string
+	Class01                 string
+	Class02                 string
+	Class03                 string
+	Class04                 string
+	Class05                 string
+	Class06                 string
+	Class07                 string
+	Class08                 string
+	Class09                 string
+	Class10                 string
 	Code                    string
 	CopyRemarks             byte
 	CostPriceCurrency       string
@@ -42,34 +42,34 @@ type ItemBQ struct {
 	Division                int32
 	EndDate                 bigquery.NullTimestamp
 	ExtraDescription        string
-	FreeBoolField_01        bool
-	FreeBoolField_02        bool
-	FreeBoolField_03        bool
-	FreeBoolField_04        bool
-	FreeBoolField_05        bool
-	FreeDateField_01        bigquery.NullTimestamp
-	FreeDateField_02        bigquery.NullTimestamp
-	FreeDateField_03        bigquery.NullTimestamp
-	FreeDateField_04        bigquery.NullTimestamp
-	FreeDateField_05        bigquery.NullTimestamp
-	FreeNumberField_01      float64
-	FreeNumberField_02      float64
-	FreeNumberField_03      float64
-	FreeNumberField_04      float64
-	FreeNumberField_05      float64
-	FreeNumberField_06      float64
-	FreeNumberField_07      float64
-	FreeNumberField_08      float64
-	FreeTextField_01        string
-	FreeTextField_02        string
-	FreeTextField_03        string
-	FreeTextField_04        string
-	FreeTextField_05        string
-	FreeTextField_06        string
-	FreeTextField_07        string
-	FreeTextField_08        string
-	FreeTextField_09        string
-	FreeTextField_10        string
+	FreeBoolField01         bool
+	FreeBoolField02         bool
+	FreeBoolField03         bool
+	FreeBoolField04         bool
+	FreeBoolField05         bool
+	FreeDateField01         bigquery.NullTimestamp
+	FreeDateField02         bigquery.NullTimestamp
+	FreeDateField03         bigquery.NullTimestamp
+	FreeDateField04         bigquery.NullTimestamp
+	FreeDateField05         bigquery.NullTimestamp
+	FreeNumberField01       float64
+	FreeNumberField02       float64
+	FreeNumberField03       float64
+	FreeNumberField04       float64
+	FreeNumberField05       float64
+	FreeNumberField06       float64
+	FreeNumberField07       float64
+	FreeNumberField08       float64
+	FreeTextField01         string
+	FreeTextField02         string
+	FreeTextField03         string
+	FreeTextField04         string
+	FreeTextField05         string
+	FreeTextField06         string
+	FreeTextField07         string
+	FreeTextField08         string
+	FreeTextField09         string
+	FreeTextField10         string
 	GLCosts                 string
 	GLCostsCode             string
 	GLCostsDescription      string
@@ -104,8 +104,8 @@ type ItemBQ struct {
 	NetWeightUnit           string
 	Notes                   string
 	PictureName             string
-	PictureThumbnailUrl     string
-	PictureUrl              string
+	PictureThumbnailURL     string
+	PictureURL              string
 	SalesVatCode            string
 	SalesVatCodeDescription string
 	SearchCode              string
@@ -123,16 +123,16 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.ID.String(),
 		c.AverageCost,
 		c.Barcode,
-		c.Class_01,
-		c.Class_02,
-		c.Class_03,
-		c.Class_04,
-		c.Class_05,
-		c.Class_06,
-		c.Class_07,
-		c.Class_08,
-		c.Class_09,
-		c.Class_10,
+		c.Class01,
+		c.Class02,
+		c.Class03,
+		c.Class04,
+		c.Class05,
+		c.Class06,
+		c.Class07,
+		c.Class08,
+		c.Class09,
+		c.Class10,
 		c.Code,
 		c.CopyRemarks,
 		c.CostPriceCurrency,
@@ -145,34 +145,34 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.Division,
 		bigquerytools.DateToNullTimestamp(c.EndDate),
 		c.ExtraDescription,
-		c.FreeBoolField_01,
-		c.FreeBoolField_02,
-		c.FreeBoolField_03,
-		c.FreeBoolField_04,
-		c.FreeBoolField_05,
-		bigquerytools.DateToNullTimestamp(c.FreeDateField_01),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField_02),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField_03),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField_04),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField_05),
-		c.FreeNumberField_01,
-		c.FreeNumberField_02,
-		c.FreeNumberField_03,
-		c.FreeNumberField_04,
-		c.FreeNumberField_05,
-		c.FreeNumberField_06,
-		c.FreeNumberField_07,
-		c.FreeNumberField_08,
-		c.FreeTextField_01,
-		c.FreeTextField_02,
-		c.FreeTextField_03,
-		c.FreeTextField_04,
-		c.FreeTextField_05,
-		c.FreeTextField_06,
-		c.FreeTextField_07,
-		c.FreeTextField_08,
-		c.FreeTextField_09,
-		c.FreeTextField_10,
+		c.FreeBoolField01,
+		c.FreeBoolField02,
+		c.FreeBoolField03,
+		c.FreeBoolField04,
+		c.FreeBoolField05,
+		bigquerytools.DateToNullTimestamp(c.FreeDateField01),
+		bigquerytools.DateToNullTimestamp(c.FreeDateField02),
+		bigquerytools.DateToNullTimestamp(c.FreeDateField03),
+		bigquerytools.DateToNullTimestamp(c.FreeDateField04),
+		bigquerytools.DateToNullTimestamp(c.FreeDateField05),
+		c.FreeNumberField01,
+		c.FreeNumberField02,
+		c.FreeNumberField03,
+		c.FreeNumberField04,
+		c.FreeNumberField05,
+		c.FreeNumberField06,
+		c.FreeNumberField07,
+		c.FreeNumberField08,
+		c.FreeTextField01,
+		c.FreeTextField02,
+		c.FreeTextField03,
+		c.FreeTextField04,
+		c.FreeTextField05,
+		c.FreeTextField06,
+		c.FreeTextField07,
+		c.FreeTextField08,
+		c.FreeTextField09,
+		c.FreeTextField10,
 		c.GLCosts.String(),
 		c.GLCostsCode,
 		c.GLCostsDescription,
@@ -207,8 +207,8 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.NetWeightUnit,
 		c.Notes,
 		c.PictureName,
-		c.PictureThumbnailUrl,
-		c.PictureUrl,
+		c.PictureThumbnailURL,
+		c.PictureURL,
 		c.SalesVatCode,
 		c.SalesVatCodeDescription,
 		c.SearchCode,
