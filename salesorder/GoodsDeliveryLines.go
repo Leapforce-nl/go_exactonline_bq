@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	salesorder "github.com/leapforce-libraries/go_exactonline_new/salesorder"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -53,11 +53,11 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 		clientID,
 		c.ID.String(),
 		//c.BatchNumbers,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.CustomerItemCode,
-		bigquerytools.DateToNullTimestamp(c.DeliveryDate),
+		google.DateToNullTimestamp(c.DeliveryDate),
 		c.Description,
 		c.Division,
 		c.EntryID.String(),
@@ -65,7 +65,7 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 		c.ItemCode,
 		c.ItemDescription,
 		c.LineNumber,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,
@@ -83,7 +83,7 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 	}
 }
 
-func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -91,7 +91,7 @@ func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHand
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.SalesOrderClient().NewGetGoodsDeliveryLinesCall(lastModified)
+	call := service.SalesOrderService().NewGetGoodsDeliveryLinesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -118,7 +118,7 @@ func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHand
 		for _, tl := range *goodsDeliveryLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getGoodsDeliveryLineBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getGoodsDeliveryLineBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -144,7 +144,7 @@ func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHand
 			}
 			w = nil
 
-			fmt.Printf("#GoodsDeliveryLines for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#GoodsDeliveryLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -161,7 +161,7 @@ func (client *Client) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHand
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#GoodsDeliveryLines for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#GoodsDeliveryLines for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, GoodsDeliveryLineBQ{}, nil
 }

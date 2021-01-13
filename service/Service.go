@@ -4,13 +4,13 @@ import (
 	exactonline "github.com/leapforce-libraries/go_exactonline_new"
 )
 
-// Client contains ClientID and Insightly APIKey of specific client
+// Service contains ClientID and Insightly APIKey of specific client
 //
-type Client struct {
+type Service struct {
 	ClientID                string
 	ExactOnlineClientID     string
 	ExactOnlineClientSecret string
 	ExactOnlineDivision     int
 	Tables                  string
-	ExactOnline             *exactonline.ExactOnline
+	ExactOnlineService      *exactonline.Service
 }

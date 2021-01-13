@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	budget "github.com/leapforce-libraries/go_exactonline_new/budget"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -56,7 +56,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 		c.CostcenterDescription,
 		c.Costunit,
 		c.CostunitDescription,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
@@ -67,7 +67,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.ReportingPeriod,
@@ -75,7 +75,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 	}
 }
 
-func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -83,7 +83,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.BudgetClient().NewGetBudgetsCall(lastModified)
+	call := service.BudgetService().NewGetBudgetsCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -110,7 +110,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 		for _, tl := range *budgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getBudgetBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getBudgetBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -136,7 +136,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 			}
 			w = nil
 
-			fmt.Printf("#Budgets for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#Budgets for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -153,7 +153,7 @@ func (client *Client) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastMod
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Budgets for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#Budgets for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, BudgetBQ{}, nil
 }

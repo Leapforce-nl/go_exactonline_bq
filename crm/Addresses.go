@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -87,7 +87,7 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.ContactName,
 		c.Country,
 		c.CountryName,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
@@ -97,11 +97,11 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.FreeBoolField03,
 		c.FreeBoolField04,
 		c.FreeBoolField05,
-		bigquerytools.DateToNullTimestamp(c.FreeDateField01),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField02),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField03),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField04),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField05),
+		google.DateToNullTimestamp(c.FreeDateField01),
+		google.DateToNullTimestamp(c.FreeDateField02),
+		google.DateToNullTimestamp(c.FreeDateField03),
+		google.DateToNullTimestamp(c.FreeDateField04),
+		google.DateToNullTimestamp(c.FreeDateField05),
 		c.FreeNumberField01,
 		c.FreeNumberField02,
 		c.FreeNumberField03,
@@ -114,7 +114,7 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.FreeTextField05,
 		c.Mailbox,
 		c.Main,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NicNumber,
@@ -131,7 +131,7 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 	}
 }
 
-func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -143,7 +143,7 @@ func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastM
 		ModifiedAfter: lastModified,
 	}
 
-	call := client.CRMClient().NewGetAddressesCall(getAddressesCallparams)
+	call := service.CRMService().NewGetAddressesCall(&getAddressesCallparams)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -170,7 +170,7 @@ func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastM
 		for _, tl := range *addresses {
 			batchRowCount++
 
-			b, err := json.Marshal(getAddressBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getAddressBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -196,7 +196,7 @@ func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastM
 			}
 			w = nil
 
-			fmt.Printf("#Addresses for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#Addresses for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -213,7 +213,7 @@ func (client *Client) WriteAddressesBQ(bucketHandle *storage.BucketHandle, lastM
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Addresses for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#Addresses for client %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, AddressBQ{}, nil
 }

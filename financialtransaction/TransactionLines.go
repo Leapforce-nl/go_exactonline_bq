@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -105,17 +105,17 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.CostCenterDescription,
 		c.CostUnit,
 		c.CostUnitDescription,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
-		bigquerytools.DateToNullTimestamp(c.Date),
+		google.DateToNullTimestamp(c.Date),
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
-		bigquerytools.DateToNullTimestamp(c.DueDate),
+		google.DateToNullTimestamp(c.DueDate),
 		c.EntryID.String(),
 		c.EntryNumber,
 		c.ExchangeRate,
@@ -134,7 +134,7 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.JournalDescription,
 		c.LineNumber,
 		c.LineType,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,
@@ -161,7 +161,7 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 	}
 }
 
-func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -169,7 +169,7 @@ func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.FinancialTransactionClient().NewGetTransactionLinesCall(lastModified)
+	call := service.FinancialTransactionService().NewGetTransactionLinesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -196,7 +196,7 @@ func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getTransactionLineBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getTransactionLineBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -222,7 +222,7 @@ func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle
 			}
 			w = nil
 
-			fmt.Printf("#TransactionLines for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#TransactionLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -239,7 +239,7 @@ func (client *Client) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#TransactionLines for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#TransactionLines for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, TransactionLineBQ{}, nil
 }

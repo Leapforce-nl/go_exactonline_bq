@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	salesorder "github.com/leapforce-libraries/go_exactonline_new/salesorder"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -52,7 +52,7 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 	return GoodsDeliveryBQ{
 		clientID,
 		c.EntryID.String(),
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.DeliveryAccount.String(),
@@ -61,14 +61,14 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 		c.DeliveryAddress.String(),
 		c.DeliveryContact.String(),
 		c.DeliveryContactPersonFullName,
-		bigquerytools.DateToNullTimestamp(c.DeliveryDate),
+		google.DateToNullTimestamp(c.DeliveryDate),
 		c.DeliveryNumber,
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentSubject,
 		c.EntryNumber,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Remarks,
@@ -82,7 +82,7 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 	}
 }
 
-func (client *Client) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -90,7 +90,7 @@ func (client *Client) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle,
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.SalesOrderClient().NewGetGoodsDeliveriesCall(lastModified)
+	call := service.SalesOrderService().NewGetGoodsDeliveriesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -117,7 +117,7 @@ func (client *Client) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle,
 		for _, tl := range *goodsDeliveries {
 			batchRowCount++
 
-			b, err := json.Marshal(getGoodsDeliveryBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getGoodsDeliveryBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -143,7 +143,7 @@ func (client *Client) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle,
 			}
 			w = nil
 
-			fmt.Printf("#GoodsDeliveries for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#GoodsDeliveries for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -160,7 +160,7 @@ func (client *Client) WriteGoodsDeliveriesBQ(bucketHandle *storage.BucketHandle,
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#GoodsDeliveries for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#GoodsDeliveries for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, GoodsDeliveryBQ{}, nil
 }

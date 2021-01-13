@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -48,30 +48,30 @@ func getSalesItemPriceBQ(c *logistics.SalesItemPrice, clientID string) SalesItem
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountName,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
 		c.DefaultItemUnit,
 		c.DefaultItemUnitDescription,
 		c.Division,
-		bigquerytools.DateToNullTimestamp(c.EndDate),
+		google.DateToNullTimestamp(c.EndDate),
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NumberOfItemsPerUnit,
 		c.Price,
 		c.Quantity,
-		bigquerytools.DateToNullTimestamp(c.StartDate),
+		google.DateToNullTimestamp(c.StartDate),
 		c.Unit,
 		c.UnitDescription,
 	}
 }
 
-func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -79,7 +79,7 @@ func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle,
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.LogisticsClient().NewGetSalesItemPricesCall(lastModified)
+	call := service.LogisticsService().NewGetSalesItemPricesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -106,7 +106,7 @@ func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle,
 		for _, tl := range *salesItemPrices {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesItemPriceBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getSalesItemPriceBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -132,7 +132,7 @@ func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle,
 			}
 			w = nil
 
-			fmt.Printf("#SalesItemPrices for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#SalesItemPrices for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -149,7 +149,7 @@ func (client *Client) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle,
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#SalesItemPrices for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#SalesItemPrices for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, SalesItemPriceBQ{}, nil
 }

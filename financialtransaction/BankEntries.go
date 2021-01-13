@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -46,7 +46,7 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 		c.BankStatementDocumentNumber,
 		c.BankStatementDocumentSubject,
 		c.ClosingBalanceFC,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Currency,
 		c.Division,
 		c.EntryNumber,
@@ -54,14 +54,14 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 		c.FinancialYear,
 		c.JournalCode,
 		c.JournalDescription,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.OpeningBalanceFC,
 		c.Status,
 		c.StatusDescription,
 	}
 }
 
-func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -69,7 +69,7 @@ func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, las
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.FinancialTransactionClient().NewGetBankEntriesCall(lastModified)
+	call := service.FinancialTransactionService().NewGetBankEntriesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -96,7 +96,7 @@ func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, las
 		for _, tl := range *bankEntries {
 			batchRowCount++
 
-			b, err := json.Marshal(getBankEntryBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getBankEntryBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -122,7 +122,7 @@ func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, las
 			}
 			w = nil
 
-			fmt.Printf("#BankEntries for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#BankEntries for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -139,7 +139,7 @@ func (client *Client) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, las
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#BankEntries for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#BankEntries for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, BankEntryBQ{}, nil
 }

@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -202,19 +202,19 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.CodeAtSupplier,
 		c.CompanySize.String(),
 		c.ConsolidationScenario,
-		bigquerytools.DateToNullTimestamp(c.ControlledDate),
+		google.DateToNullTimestamp(c.ControlledDate),
 		c.Costcenter,
 		c.CostcenterDescription,
 		c.CostPaid,
 		c.Country,
 		c.CountryName,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.CreditLinePurchase,
 		c.CreditLineSales,
 		c.Currency,
-		bigquerytools.DateToNullTimestamp(c.CustomerSince),
+		google.DateToNullTimestamp(c.CustomerSince),
 		c.DatevCreditorCode,
 		c.DatevDebtorCode,
 		c.DiscountPurchase,
@@ -223,8 +223,8 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.Document.String(),
 		c.DunsNumber,
 		c.Email,
-		bigquerytools.DateToNullTimestamp(c.EndDate),
-		bigquerytools.DateToNullTimestamp(c.EstablishedDate),
+		google.DateToNullTimestamp(c.EndDate),
+		google.DateToNullTimestamp(c.EstablishedDate),
 		c.Fax,
 		c.GLAccountPurchase.String(),
 		c.GLAccountSales.String(),
@@ -268,7 +268,7 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.LogoUrl,
 		c.Longitude,
 		c.MainContact.String(),
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Name,
@@ -307,11 +307,11 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.SeparateInvPerSubscription,
 		c.ShippingLeadDays,
 		c.ShippingMethod.String(),
-		bigquerytools.DateToNullTimestamp(c.StartDate),
+		google.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.StateName,
 		c.Status,
-		bigquerytools.DateToNullTimestamp(c.StatusSince),
+		google.DateToNullTimestamp(c.StatusSince),
 		c.TradeName,
 		c.Type,
 		c.UniqueTaxpayerReference,
@@ -321,7 +321,7 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 	}
 }
 
-func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -333,7 +333,7 @@ func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastMo
 		ModifiedAfter: lastModified,
 	}
 
-	call := client.CRMClient().NewGetAccountsCall(getAccountsCallParams)
+	call := service.CRMService().NewGetAccountsCall(&getAccountsCallParams)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -360,7 +360,7 @@ func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastMo
 		for _, tl := range *accounts {
 			batchRowCount++
 
-			b, err := json.Marshal(getAccountBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getAccountBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -386,7 +386,7 @@ func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastMo
 			}
 			w = nil
 
-			fmt.Printf("#Accounts for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#Accounts for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -403,7 +403,7 @@ func (client *Client) WriteAccountsBQ(bucketHandle *storage.BucketHandle, lastMo
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Accounts for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#Accounts for client %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, AccountBQ{}, nil
 }

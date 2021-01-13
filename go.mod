@@ -1,12 +1,12 @@
 module github.com/leapforce-libraries/go_exactonline_bq
 
-go 1.13
+go 1.15
 
 require (
 	cloud.google.com/go/bigquery v1.14.0
 	cloud.google.com/go/storage v1.12.0
-	github.com/leapforce-libraries/go_bigquerytools v0.0.0-20201127131929-ee11d040f98f
-	github.com/leapforce-libraries/go_errortools v0.0.0-20201204210737-d975f1003e2b
-	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20201221115112-105082715fdd
-	github.com/leapforce-libraries/go_types v0.0.0-20201204130714-c0a94473b498
+	github.com/leapforce-libraries/go_errortools v0.0.0-20210111150536-e5045146a74f
+	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210113104100-c858cf5aabcc
+	github.com/leapforce-libraries/go_google v0.0.0-20210111150913-7d6be991b5f9
+	github.com/leapforce-libraries/go_types v0.0.0-20210104111853-9f631f6df966
 )

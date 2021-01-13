@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -138,23 +138,23 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.CostPriceCurrency,
 		c.CostPriceNew,
 		c.CostPriceStandard,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Description,
 		c.Division,
-		bigquerytools.DateToNullTimestamp(c.EndDate),
+		google.DateToNullTimestamp(c.EndDate),
 		c.ExtraDescription,
 		c.FreeBoolField01,
 		c.FreeBoolField02,
 		c.FreeBoolField03,
 		c.FreeBoolField04,
 		c.FreeBoolField05,
-		bigquerytools.DateToNullTimestamp(c.FreeDateField01),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField02),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField03),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField04),
-		bigquerytools.DateToNullTimestamp(c.FreeDateField05),
+		google.DateToNullTimestamp(c.FreeDateField01),
+		google.DateToNullTimestamp(c.FreeDateField02),
+		google.DateToNullTimestamp(c.FreeDateField03),
+		google.DateToNullTimestamp(c.FreeDateField04),
+		google.DateToNullTimestamp(c.FreeDateField05),
 		c.FreeNumberField01,
 		c.FreeNumberField02,
 		c.FreeNumberField03,
@@ -200,7 +200,7 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.ItemGroup.String(),
 		c.ItemGroupCode,
 		c.ItemGroupDescription,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NetWeight,
@@ -213,7 +213,7 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.SalesVatCodeDescription,
 		c.SearchCode,
 		c.SecurityLevel,
-		bigquerytools.DateToNullTimestamp(c.StartDate),
+		google.DateToNullTimestamp(c.StartDate),
 		c.Stock,
 		c.Unit,
 		c.UnitDescription,
@@ -221,7 +221,7 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 	}
 }
 
-func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -229,7 +229,7 @@ func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModif
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := client.LogisticsClient().NewGetItemsCall(lastModified)
+	call := service.LogisticsService().NewGetItemsCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -256,7 +256,7 @@ func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModif
 		for _, tl := range *items {
 			batchRowCount++
 
-			b, err := json.Marshal(getItemBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getItemBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -282,7 +282,7 @@ func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModif
 			}
 			w = nil
 
-			fmt.Printf("#Items for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#Items for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -299,7 +299,7 @@ func (client *Client) WriteItemsBQ(bucketHandle *storage.BucketHandle, lastModif
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Items for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#Items for service %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, ItemBQ{}, nil
 }

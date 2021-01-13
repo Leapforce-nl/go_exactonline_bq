@@ -9,9 +9,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/leapforce-libraries/go_bigquerytools"
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
+	google "github.com/leapforce-libraries/go_google"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -99,7 +99,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.AddressStreetNumber,
 		c.AddressStreetNumberSuffix,
 		c.AllowMailing,
-		bigquerytools.DateToNullTimestamp(c.BirthDate),
+		google.DateToNullTimestamp(c.BirthDate),
 		c.BirthName,
 		c.BirthNamePrefix,
 		c.BirthPlace,
@@ -111,17 +111,17 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.City,
 		c.Code,
 		c.Country,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		google.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
 		c.Email,
-		bigquerytools.DateToNullTimestamp(c.EndDate),
+		google.DateToNullTimestamp(c.EndDate),
 		c.FirstName,
 		c.FullName,
 		c.Gender,
 		c.HID,
-		bigquerytools.DateToNullTimestamp(c.IdentificationDate),
+		google.DateToNullTimestamp(c.IdentificationDate),
 		c.IdentificationDocument.String(),
 		c.IdentificationUser.String(),
 		c.Initials,
@@ -136,7 +136,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.MarketingNotes,
 		c.MiddleName,
 		c.Mobile,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		google.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Nationality,
@@ -151,13 +151,13 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.PictureUrl,
 		c.Postcode,
 		c.SocialSecurityNumber,
-		bigquerytools.DateToNullTimestamp(c.StartDate),
+		google.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.Title,
 	}
 }
 
-func (client *Client) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -169,7 +169,7 @@ func (client *Client) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastMo
 		ModifiedAfter: lastModified,
 	}
 
-	call := client.CRMClient().NewGetContactsCall(getContactsCallParams)
+	call := service.CRMService().NewGetContactsCall(&getContactsCallParams)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -196,7 +196,7 @@ func (client *Client) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastMo
 		for _, tl := range *contacts {
 			batchRowCount++
 
-			b, err := json.Marshal(getContactBQ(&tl, client.ClientID()))
+			b, err := json.Marshal(getContactBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -222,7 +222,7 @@ func (client *Client) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastMo
 			}
 			w = nil
 
-			fmt.Printf("#Contacts for client %s flushed: %v\n", client.ClientID(), batchRowCount)
+			fmt.Printf("#Contacts for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -239,7 +239,7 @@ func (client *Client) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastMo
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Contacts for client %s: %v\n", client.ClientID(), rowCount)
+	fmt.Printf("#Contacts for client %s: %v\n", service.ClientID(), rowCount)
 
 	return objectHandles, rowCount, ContactBQ{}, nil
 }
