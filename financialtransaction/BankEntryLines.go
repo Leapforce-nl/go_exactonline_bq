@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -31,10 +31,10 @@ type BankEntryLineBQ struct {
 	CostCenterDescription string
 	CostUnit              string
 	CostUnitDescription   string
-	Created               bigquery.NullTimestamp
+	Created               _bigquery.NullTimestamp
 	Creator               string
 	CreatorFullName       string
-	Date                  bigquery.NullTimestamp
+	Date                  _bigquery.NullTimestamp
 	Description           string
 	Division              int32
 	Document              string
@@ -47,7 +47,7 @@ type BankEntryLineBQ struct {
 	GLAccountCode         string
 	GLAccountDescription  string
 	LineNumber            int32
-	Modified              bigquery.NullTimestamp
+	Modified              _bigquery.NullTimestamp
 	Modifier              string
 	ModifierFullName      string
 	Notes                 string
@@ -80,10 +80,10 @@ func getBankEntryLineBQ(c *financialtransaction.BankEntryLine, clientID string) 
 		c.CostCenterDescription,
 		c.CostUnit,
 		c.CostUnitDescription,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
-		google.DateToNullTimestamp(c.Date),
+		bigquery.DateToNullTimestamp(c.Date),
 		c.Description,
 		c.Division,
 		c.Document.String(),
@@ -96,7 +96,7 @@ func getBankEntryLineBQ(c *financialtransaction.BankEntryLine, clientID string) 
 		c.GLAccountCode,
 		c.GLAccountDescription,
 		c.LineNumber,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,

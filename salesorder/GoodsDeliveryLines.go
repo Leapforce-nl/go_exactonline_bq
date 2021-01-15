@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	salesorder "github.com/leapforce-libraries/go_exactonline_new/salesorder"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -19,11 +19,11 @@ type GoodsDeliveryLineBQ struct {
 	ClientID string
 	ID       string
 	//BatchNumbers
-	Created              bigquery.NullTimestamp
+	Created              _bigquery.NullTimestamp
 	Creator              string
 	CreatorFullName      string
 	CustomerItemCode     string
-	DeliveryDate         bigquery.NullTimestamp
+	DeliveryDate         _bigquery.NullTimestamp
 	Description          string
 	Division             int32
 	EntryID              string
@@ -31,7 +31,7 @@ type GoodsDeliveryLineBQ struct {
 	ItemCode             string
 	ItemDescription      string
 	LineNumber           int32
-	Modified             bigquery.NullTimestamp
+	Modified             _bigquery.NullTimestamp
 	Modifier             string
 	ModifierFullName     string
 	Notes                string
@@ -53,11 +53,11 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 		clientID,
 		c.ID.String(),
 		//c.BatchNumbers,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.CustomerItemCode,
-		google.DateToNullTimestamp(c.DeliveryDate),
+		bigquery.DateToNullTimestamp(c.DeliveryDate),
 		c.Description,
 		c.Division,
 		c.EntryID.String(),
@@ -65,7 +65,7 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 		c.ItemCode,
 		c.ItemDescription,
 		c.LineNumber,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,

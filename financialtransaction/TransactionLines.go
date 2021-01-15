@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -32,17 +32,17 @@ type TransactionLineBQ struct {
 	CostCenterDescription     string
 	CostUnit                  string
 	CostUnitDescription       string
-	Created                   bigquery.NullTimestamp
+	Created                   _bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	Currency                  string
-	Date                      bigquery.NullTimestamp
+	Date                      _bigquery.NullTimestamp
 	Description               string
 	Division                  int64
 	Document                  string
 	DocumentNumber            int64
 	DocumentSubject           string
-	DueDate                   bigquery.NullTimestamp
+	DueDate                   _bigquery.NullTimestamp
 	EntryID                   string
 	EntryNumber               int64
 	ExchangeRate              float64
@@ -61,7 +61,7 @@ type TransactionLineBQ struct {
 	JournalDescription        string
 	LineNumber                int64
 	LineType                  int64
-	Modified                  bigquery.NullTimestamp
+	Modified                  _bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	Notes                     string
@@ -105,17 +105,17 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.CostCenterDescription,
 		c.CostUnit,
 		c.CostUnitDescription,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
-		google.DateToNullTimestamp(c.Date),
+		bigquery.DateToNullTimestamp(c.Date),
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
-		google.DateToNullTimestamp(c.DueDate),
+		bigquery.DateToNullTimestamp(c.DueDate),
 		c.EntryID.String(),
 		c.EntryNumber,
 		c.ExchangeRate,
@@ -134,7 +134,7 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.JournalDescription,
 		c.LineNumber,
 		c.LineType,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,

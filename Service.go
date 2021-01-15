@@ -8,7 +8,7 @@ import (
 	logistics "github.com/leapforce-libraries/go_exactonline_bq/logistics"
 	salesorder "github.com/leapforce-libraries/go_exactonline_bq/salesorder"
 	exactonline "github.com/leapforce-libraries/go_exactonline_new"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 )
 
 type Service struct {
@@ -19,8 +19,8 @@ type Service struct {
 	SalesOrderService           *salesorder.Service
 }
 
-func NewService(division int32, clientID string, exactOnlineServiceID string, exactOnlineServiceSecret string, bigQuery *google.BigQuery) (*Service, *errortools.Error) {
-	exactonlineService, e := exactonline.NewService(division, exactOnlineServiceID, exactOnlineServiceSecret, bigQuery)
+func NewService(division int32, clientID string, exactOnlineServiceID string, exactOnlineServiceSecret string, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
+	exactonlineService, e := exactonline.NewService(division, exactOnlineServiceID, exactOnlineServiceSecret, bigQueryService)
 	if e != nil {
 		return nil, e
 	}

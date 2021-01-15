@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -35,23 +35,23 @@ type ItemBQ struct {
 	CostPriceCurrency       string
 	CostPriceNew            float64
 	CostPriceStandard       float64
-	Created                 bigquery.NullTimestamp
+	Created                 _bigquery.NullTimestamp
 	Creator                 string
 	CreatorFullName         string
 	Description             string
 	Division                int32
-	EndDate                 bigquery.NullTimestamp
+	EndDate                 _bigquery.NullTimestamp
 	ExtraDescription        string
 	FreeBoolField01         bool
 	FreeBoolField02         bool
 	FreeBoolField03         bool
 	FreeBoolField04         bool
 	FreeBoolField05         bool
-	FreeDateField01         bigquery.NullTimestamp
-	FreeDateField02         bigquery.NullTimestamp
-	FreeDateField03         bigquery.NullTimestamp
-	FreeDateField04         bigquery.NullTimestamp
-	FreeDateField05         bigquery.NullTimestamp
+	FreeDateField01         _bigquery.NullTimestamp
+	FreeDateField02         _bigquery.NullTimestamp
+	FreeDateField03         _bigquery.NullTimestamp
+	FreeDateField04         _bigquery.NullTimestamp
+	FreeDateField05         _bigquery.NullTimestamp
 	FreeNumberField01       float64
 	FreeNumberField02       float64
 	FreeNumberField03       float64
@@ -97,7 +97,7 @@ type ItemBQ struct {
 	ItemGroup               string
 	ItemGroupCode           string
 	ItemGroupDescription    string
-	Modified                bigquery.NullTimestamp
+	Modified                _bigquery.NullTimestamp
 	Modifier                string
 	ModifierFullName        string
 	NetWeight               float64
@@ -110,7 +110,7 @@ type ItemBQ struct {
 	SalesVatCodeDescription string
 	SearchCode              string
 	SecurityLevel           int32
-	StartDate               bigquery.NullTimestamp
+	StartDate               _bigquery.NullTimestamp
 	Stock                   float64
 	Unit                    string
 	UnitDescription         string
@@ -138,23 +138,23 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.CostPriceCurrency,
 		c.CostPriceNew,
 		c.CostPriceStandard,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Description,
 		c.Division,
-		google.DateToNullTimestamp(c.EndDate),
+		bigquery.DateToNullTimestamp(c.EndDate),
 		c.ExtraDescription,
 		c.FreeBoolField01,
 		c.FreeBoolField02,
 		c.FreeBoolField03,
 		c.FreeBoolField04,
 		c.FreeBoolField05,
-		google.DateToNullTimestamp(c.FreeDateField01),
-		google.DateToNullTimestamp(c.FreeDateField02),
-		google.DateToNullTimestamp(c.FreeDateField03),
-		google.DateToNullTimestamp(c.FreeDateField04),
-		google.DateToNullTimestamp(c.FreeDateField05),
+		bigquery.DateToNullTimestamp(c.FreeDateField01),
+		bigquery.DateToNullTimestamp(c.FreeDateField02),
+		bigquery.DateToNullTimestamp(c.FreeDateField03),
+		bigquery.DateToNullTimestamp(c.FreeDateField04),
+		bigquery.DateToNullTimestamp(c.FreeDateField05),
 		c.FreeNumberField01,
 		c.FreeNumberField02,
 		c.FreeNumberField03,
@@ -200,7 +200,7 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.ItemGroup.String(),
 		c.ItemGroupCode,
 		c.ItemGroupDescription,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NetWeight,
@@ -213,7 +213,7 @@ func getItemBQ(c *logistics.Item, clientID string) ItemBQ {
 		c.SalesVatCodeDescription,
 		c.SearchCode,
 		c.SecurityLevel,
-		google.DateToNullTimestamp(c.StartDate),
+		bigquery.DateToNullTimestamp(c.StartDate),
 		c.Stock,
 		c.Unit,
 		c.UnitDescription,

@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -49,19 +49,19 @@ type AccountBQ struct {
 	CodeAtSupplier            string
 	CompanySize               string
 	ConsolidationScenario     byte
-	ControlledDate            bigquery.NullTimestamp
+	ControlledDate            _bigquery.NullTimestamp
 	Costcenter                string
 	CostcenterDescription     string
 	CostPaid                  byte
 	Country                   string
 	CountryName               string
-	Created                   bigquery.NullTimestamp
+	Created                   _bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	CreditLinePurchase        float64
 	CreditLineSales           float64
 	Currency                  string
-	CustomerSince             bigquery.NullTimestamp
+	CustomerSince             _bigquery.NullTimestamp
 	DatevCreditorCode         string
 	DatevDebtorCode           string
 	DiscountPurchase          float64
@@ -70,8 +70,8 @@ type AccountBQ struct {
 	Document                  string
 	DunsNumber                string
 	Email                     string
-	EndDate                   bigquery.NullTimestamp
-	EstablishedDate           bigquery.NullTimestamp
+	EndDate                   _bigquery.NullTimestamp
+	EstablishedDate           _bigquery.NullTimestamp
 	Fax                       string
 	GLAccountPurchase         string
 	GLAccountSales            string
@@ -115,7 +115,7 @@ type AccountBQ struct {
 	LogoUrl                             string
 	Longitude                           float64
 	MainContact                         string
-	Modified                            bigquery.NullTimestamp
+	Modified                            _bigquery.NullTimestamp
 	Modifier                            string
 	ModifierFullName                    string
 	Name                                string
@@ -154,11 +154,11 @@ type AccountBQ struct {
 	SeparateInvPerSubscription          byte
 	ShippingLeadDays                    int32
 	ShippingMethod                      string
-	StartDate                           bigquery.NullTimestamp
+	StartDate                           _bigquery.NullTimestamp
 	State                               string
 	StateName                           string
 	Status                              string
-	StatusSince                         bigquery.NullTimestamp
+	StatusSince                         _bigquery.NullTimestamp
 	TradeName                           string
 	Type                                string
 	UniqueTaxpayerReference             string
@@ -202,19 +202,19 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.CodeAtSupplier,
 		c.CompanySize.String(),
 		c.ConsolidationScenario,
-		google.DateToNullTimestamp(c.ControlledDate),
+		bigquery.DateToNullTimestamp(c.ControlledDate),
 		c.Costcenter,
 		c.CostcenterDescription,
 		c.CostPaid,
 		c.Country,
 		c.CountryName,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.CreditLinePurchase,
 		c.CreditLineSales,
 		c.Currency,
-		google.DateToNullTimestamp(c.CustomerSince),
+		bigquery.DateToNullTimestamp(c.CustomerSince),
 		c.DatevCreditorCode,
 		c.DatevDebtorCode,
 		c.DiscountPurchase,
@@ -223,8 +223,8 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.Document.String(),
 		c.DunsNumber,
 		c.Email,
-		google.DateToNullTimestamp(c.EndDate),
-		google.DateToNullTimestamp(c.EstablishedDate),
+		bigquery.DateToNullTimestamp(c.EndDate),
+		bigquery.DateToNullTimestamp(c.EstablishedDate),
 		c.Fax,
 		c.GLAccountPurchase.String(),
 		c.GLAccountSales.String(),
@@ -268,7 +268,7 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.LogoUrl,
 		c.Longitude,
 		c.MainContact.String(),
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Name,
@@ -307,11 +307,11 @@ func getAccountBQ(c *crm.Account, clientID string) AccountBQ {
 		c.SeparateInvPerSubscription,
 		c.ShippingLeadDays,
 		c.ShippingMethod.String(),
-		google.DateToNullTimestamp(c.StartDate),
+		bigquery.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.StateName,
 		c.Status,
-		google.DateToNullTimestamp(c.StatusSince),
+		bigquery.DateToNullTimestamp(c.StatusSince),
 		c.TradeName,
 		c.Type,
 		c.UniqueTaxpayerReference,

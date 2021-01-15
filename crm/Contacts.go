@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -28,7 +28,7 @@ type ContactBQ struct {
 	AddressStreetNumber       string
 	AddressStreetNumberSuffix string
 	AllowMailing              int32
-	BirthDate                 bigquery.NullTimestamp
+	BirthDate                 _bigquery.NullTimestamp
 	BirthName                 string
 	BirthNamePrefix           string
 	BirthPlace                string
@@ -40,17 +40,17 @@ type ContactBQ struct {
 	City                      string
 	Code                      string
 	Country                   string
-	Created                   bigquery.NullTimestamp
+	Created                   _bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	Division                  int32
 	Email                     string
-	EndDate                   bigquery.NullTimestamp
+	EndDate                   _bigquery.NullTimestamp
 	FirstName                 string
 	FullName                  string
 	Gender                    string
 	HID                       int32
-	IdentificationDate        bigquery.NullTimestamp
+	IdentificationDate        _bigquery.NullTimestamp
 	IdentificationDocument    string
 	IdentificationUser        string
 	Initials                  string
@@ -65,7 +65,7 @@ type ContactBQ struct {
 	MarketingNotes            string
 	MiddleName                string
 	Mobile                    string
-	Modified                  bigquery.NullTimestamp
+	Modified                  _bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	Nationality               string
@@ -80,7 +80,7 @@ type ContactBQ struct {
 	PictureUrl                string
 	Postcode                  string
 	SocialSecurityNumber      string
-	StartDate                 bigquery.NullTimestamp
+	StartDate                 _bigquery.NullTimestamp
 	State                     string
 	Title                     string
 }
@@ -99,7 +99,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.AddressStreetNumber,
 		c.AddressStreetNumberSuffix,
 		c.AllowMailing,
-		google.DateToNullTimestamp(c.BirthDate),
+		bigquery.DateToNullTimestamp(c.BirthDate),
 		c.BirthName,
 		c.BirthNamePrefix,
 		c.BirthPlace,
@@ -111,17 +111,17 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.City,
 		c.Code,
 		c.Country,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
 		c.Email,
-		google.DateToNullTimestamp(c.EndDate),
+		bigquery.DateToNullTimestamp(c.EndDate),
 		c.FirstName,
 		c.FullName,
 		c.Gender,
 		c.HID,
-		google.DateToNullTimestamp(c.IdentificationDate),
+		bigquery.DateToNullTimestamp(c.IdentificationDate),
 		c.IdentificationDocument.String(),
 		c.IdentificationUser.String(),
 		c.Initials,
@@ -136,7 +136,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.MarketingNotes,
 		c.MiddleName,
 		c.Mobile,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Nationality,
@@ -151,7 +151,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.PictureUrl,
 		c.Postcode,
 		c.SocialSecurityNumber,
-		google.DateToNullTimestamp(c.StartDate),
+		bigquery.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.Title,
 	}

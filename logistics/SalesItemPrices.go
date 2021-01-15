@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -20,24 +20,24 @@ type SalesItemPriceBQ struct {
 	ID                         string
 	Account                    string
 	AccountName                string
-	Created                    bigquery.NullTimestamp
+	Created                    _bigquery.NullTimestamp
 	Creator                    string
 	CreatorFullName            string
 	Currency                   string
 	DefaultItemUnit            string
 	DefaultItemUnitDescription string
 	Division                   int32
-	EndDate                    bigquery.NullTimestamp
+	EndDate                    _bigquery.NullTimestamp
 	Item                       string
 	ItemCode                   string
 	ItemDescription            string
-	Modified                   bigquery.NullTimestamp
+	Modified                   _bigquery.NullTimestamp
 	Modifier                   string
 	ModifierFullName           string
 	NumberOfItemsPerUnit       float64
 	Price                      float64
 	Quantity                   float64
-	StartDate                  bigquery.NullTimestamp
+	StartDate                  _bigquery.NullTimestamp
 	Unit                       string
 	UnitDescription            string
 }
@@ -48,24 +48,24 @@ func getSalesItemPriceBQ(c *logistics.SalesItemPrice, clientID string) SalesItem
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountName,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
 		c.DefaultItemUnit,
 		c.DefaultItemUnitDescription,
 		c.Division,
-		google.DateToNullTimestamp(c.EndDate),
+		bigquery.DateToNullTimestamp(c.EndDate),
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NumberOfItemsPerUnit,
 		c.Price,
 		c.Quantity,
-		google.DateToNullTimestamp(c.StartDate),
+		bigquery.DateToNullTimestamp(c.StartDate),
 		c.Unit,
 		c.UnitDescription,
 	}

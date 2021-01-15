@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	salesorder "github.com/leapforce-libraries/go_exactonline_new/salesorder"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
 type GoodsDeliveryBQ struct {
 	ClientID                      string
 	EntryID                       string
-	Created                       bigquery.NullTimestamp
+	Created                       _bigquery.NullTimestamp
 	Creator                       string
 	CreatorFullName               string
 	DeliveryAccount               string
@@ -27,7 +27,7 @@ type GoodsDeliveryBQ struct {
 	DeliveryAddress               string
 	DeliveryContact               string
 	DeliveryContactPersonFullName string
-	DeliveryDate                  bigquery.NullTimestamp
+	DeliveryDate                  _bigquery.NullTimestamp
 	DeliveryNumber                int32
 	Description                   string
 	Division                      int32
@@ -35,7 +35,7 @@ type GoodsDeliveryBQ struct {
 	DocumentSubject               string
 	EntryNumber                   int32
 	//GoodsDeliveryLines
-	Modified                  bigquery.NullTimestamp
+	Modified                  _bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	Remarks                   string
@@ -52,7 +52,7 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 	return GoodsDeliveryBQ{
 		clientID,
 		c.EntryID.String(),
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.DeliveryAccount.String(),
@@ -61,14 +61,14 @@ func getGoodsDeliveryBQ(c *salesorder.GoodsDelivery, clientID string) GoodsDeliv
 		c.DeliveryAddress.String(),
 		c.DeliveryContact.String(),
 		c.DeliveryContactPersonFullName,
-		google.DateToNullTimestamp(c.DeliveryDate),
+		bigquery.DateToNullTimestamp(c.DeliveryDate),
 		c.DeliveryNumber,
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentSubject,
 		c.EntryNumber,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Remarks,

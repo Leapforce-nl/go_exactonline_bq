@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -29,7 +29,7 @@ type AddressBQ struct {
 	ContactName          string
 	Country              string
 	CountryName          string
-	Created              bigquery.NullTimestamp
+	Created              _bigquery.NullTimestamp
 	Creator              string
 	CreatorFullName      string
 	Division             int32
@@ -39,11 +39,11 @@ type AddressBQ struct {
 	FreeBoolField03      bool
 	FreeBoolField04      bool
 	FreeBoolField05      bool
-	FreeDateField01      bigquery.NullTimestamp
-	FreeDateField02      bigquery.NullTimestamp
-	FreeDateField03      bigquery.NullTimestamp
-	FreeDateField04      bigquery.NullTimestamp
-	FreeDateField05      bigquery.NullTimestamp
+	FreeDateField01      _bigquery.NullTimestamp
+	FreeDateField02      _bigquery.NullTimestamp
+	FreeDateField03      _bigquery.NullTimestamp
+	FreeDateField04      _bigquery.NullTimestamp
+	FreeDateField05      _bigquery.NullTimestamp
 	FreeNumberField01    float64
 	FreeNumberField02    float64
 	FreeNumberField03    float64
@@ -56,7 +56,7 @@ type AddressBQ struct {
 	FreeTextField05      string
 	Mailbox              string
 	Main                 bool
-	Modified             bigquery.NullTimestamp
+	Modified             _bigquery.NullTimestamp
 	Modifier             string
 	ModifierFullName     string
 	NicNumber            string
@@ -87,7 +87,7 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.ContactName,
 		c.Country,
 		c.CountryName,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
@@ -97,11 +97,11 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.FreeBoolField03,
 		c.FreeBoolField04,
 		c.FreeBoolField05,
-		google.DateToNullTimestamp(c.FreeDateField01),
-		google.DateToNullTimestamp(c.FreeDateField02),
-		google.DateToNullTimestamp(c.FreeDateField03),
-		google.DateToNullTimestamp(c.FreeDateField04),
-		google.DateToNullTimestamp(c.FreeDateField05),
+		bigquery.DateToNullTimestamp(c.FreeDateField01),
+		bigquery.DateToNullTimestamp(c.FreeDateField02),
+		bigquery.DateToNullTimestamp(c.FreeDateField03),
+		bigquery.DateToNullTimestamp(c.FreeDateField04),
+		bigquery.DateToNullTimestamp(c.FreeDateField05),
 		c.FreeNumberField01,
 		c.FreeNumberField02,
 		c.FreeNumberField03,
@@ -114,7 +114,7 @@ func getAddressBQ(c *crm.Address, clientID string) AddressBQ {
 		c.FreeTextField05,
 		c.Mailbox,
 		c.Main,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NicNumber,

@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	budget "github.com/leapforce-libraries/go_exactonline_new/budget"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -26,7 +26,7 @@ type BudgetBQ struct {
 	CostcenterDescription     string
 	Costunit                  string
 	CostunitDescription       string
-	Created                   bigquery.NullTimestamp
+	Created                   _bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	Division                  int32
@@ -37,7 +37,7 @@ type BudgetBQ struct {
 	Item                      string
 	ItemCode                  string
 	ItemDescription           string
-	Modified                  bigquery.NullTimestamp
+	Modified                  _bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	ReportingPeriod           int16
@@ -56,7 +56,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 		c.CostcenterDescription,
 		c.Costunit,
 		c.CostunitDescription,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
@@ -67,7 +67,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.ReportingPeriod,

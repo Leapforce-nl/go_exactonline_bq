@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/bigquery"
+	_bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
-	google "github.com/leapforce-libraries/go_google"
+	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
@@ -23,7 +23,7 @@ type BankEntryBQ struct {
 	BankStatementDocumentNumber  int32
 	BankStatementDocumentSubject string
 	ClosingBalanceFC             float64
-	Created                      bigquery.NullTimestamp
+	Created                      _bigquery.NullTimestamp
 	Currency                     string
 	Division                     int32
 	EntryNumber                  int32
@@ -31,7 +31,7 @@ type BankEntryBQ struct {
 	FinancialYear                int16
 	JournalCode                  string
 	JournalDescription           string
-	Modified                     bigquery.NullTimestamp
+	Modified                     _bigquery.NullTimestamp
 	OpeningBalanceFC             float64
 	Status                       int16
 	StatusDescription            string
@@ -46,7 +46,7 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 		c.BankStatementDocumentNumber,
 		c.BankStatementDocumentSubject,
 		c.ClosingBalanceFC,
-		google.DateToNullTimestamp(c.Created),
+		bigquery.DateToNullTimestamp(c.Created),
 		c.Currency,
 		c.Division,
 		c.EntryNumber,
@@ -54,7 +54,7 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 		c.FinancialYear,
 		c.JournalCode,
 		c.JournalDescription,
-		google.DateToNullTimestamp(c.Modified),
+		bigquery.DateToNullTimestamp(c.Modified),
 		c.OpeningBalanceFC,
 		c.Status,
 		c.StatusDescription,
