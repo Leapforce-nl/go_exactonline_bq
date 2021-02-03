@@ -15,52 +15,49 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type GoodsDeliveryLineBQ struct {
+type PlannedSalesReturnLineBQ struct {
 	ClientID string
 	ID       string
 	//BatchNumbers
-	Created              bigquery.NullTimestamp
-	Creator              string
-	CreatorFullName      string
-	CustomerItemCode     string
-	DeliveryDate         bigquery.NullTimestamp
-	Description          string
-	Division             int32
-	EntryID              string
-	Item                 string
-	ItemCode             string
-	ItemDescription      string
-	LineNumber           int32
-	Modified             bigquery.NullTimestamp
-	Modifier             string
-	ModifierFullName     string
-	Notes                string
-	QuantityDelivered    float64
-	QuantityOrdered      float64
-	SalesOrderLineID     string
-	SalesOrderLineNumber int32
-	SalesOrderNumber     int32
+	CreateCredit          byte
+	Created               bigquery.NullTimestamp
+	Creator               string
+	CreatorFullName       string
+	Division              int32
+	GoodDeliveryLineID    string
+	Item                  string
+	ItemCode              string
+	ItemDescription       string
+	LineNumber            int32
+	Modified              bigquery.NullTimestamp
+	Modifier              string
+	ModifierFullName      string
+	Notes                 string
+	PlannedReturnQuantity float64
+	PlannedSalesReturnID  string
+	ReceivedQuantity      float64
+	SalesOrderLineID      string
+	SalesOrderNumber      int32
 	//SerialNumbers
+	StockTransactionEntryID    string
 	StorageLocation            string
 	StorageLocationCode        string
 	StorageLocationDescription string
-	TrackingNumber             string
-	Unitcode                   string
+	UnitCode                   string
+	UnitDescription            string
 }
 
-func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) GoodsDeliveryLineBQ {
-	return GoodsDeliveryLineBQ{
+func getPlannedSalesReturnLineBQ(c *salesorder.PlannedSalesReturnLine, clientID string) PlannedSalesReturnLineBQ {
+	return PlannedSalesReturnLineBQ{
 		clientID,
 		c.ID.String(),
 		//c.BatchNumbers,
+		c.CreateCredit,
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
-		c.CustomerItemCode,
-		go_bigquery.DateToNullTimestamp(c.DeliveryDate),
-		c.Description,
 		c.Division,
-		c.EntryID.String(),
+		c.GoodDeliveryLineID.String(),
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
@@ -69,21 +66,22 @@ func getGoodsDeliveryLineBQ(c *salesorder.GoodsDeliveryLine, clientID string) Go
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,
-		c.QuantityDelivered,
-		c.QuantityOrdered,
+		c.PlannedReturnQuantity,
+		c.PlannedSalesReturnID.String(),
+		c.ReceivedQuantity,
 		c.SalesOrderLineID.String(),
-		c.SalesOrderLineNumber,
 		c.SalesOrderNumber,
 		//c.SerialNumbers,
+		c.StockTransactionEntryID.String(),
 		c.StorageLocation.String(),
 		c.StorageLocationCode,
 		c.StorageLocationDescription,
-		c.TrackingNumber,
-		c.Unitcode,
+		c.UnitCode,
+		c.UnitDescription,
 	}
 }
 
-func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePlannedSalesReturnLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -91,19 +89,19 @@ func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHa
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := service.SalesOrderService().NewGetGoodsDeliveryLinesCall(lastModified)
+	call := service.SalesOrderService().NewGetPlannedSalesReturnLinesCall(lastModified)
 
 	rowCount := 0
 	batchRowCount := 0
 	batchSize := 10000
 
 	for true {
-		goodsDeliveryLines, e := call.Do()
+		plannedSalesReturnLines, e := call.Do()
 		if e != nil {
 			return nil, 0, nil, e
 		}
 
-		if goodsDeliveryLines == nil {
+		if plannedSalesReturnLines == nil {
 			break
 		}
 
@@ -115,10 +113,10 @@ func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHa
 			w = objectHandle.NewWriter(context.Background())
 		}
 
-		for _, tl := range *goodsDeliveryLines {
+		for _, tl := range *plannedSalesReturnLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getGoodsDeliveryLineBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getPlannedSalesReturnLineBQ(&tl, service.ClientID()))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -144,7 +142,7 @@ func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHa
 			}
 			w = nil
 
-			fmt.Printf("#GoodsDeliveryLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#PlannedSalesReturnLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -161,7 +159,7 @@ func (service *Service) WriteGoodsDeliveryLinesBQ(bucketHandle *storage.BucketHa
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#GoodsDeliveryLines for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#PlannedSalesReturnLines for service %s: %v\n", service.ClientID(), rowCount)
 
-	return objectHandles, rowCount, GoodsDeliveryLineBQ{}, nil
+	return objectHandles, rowCount, PlannedSalesReturnLineBQ{}, nil
 }
