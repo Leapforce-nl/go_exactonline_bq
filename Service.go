@@ -19,19 +19,34 @@ type Service struct {
 	SalesOrderService           *salesorder.Service
 }
 
-func NewService(division int32, clientID string, exactOnlineServiceID string, exactOnlineServiceSecret string, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
-	exactonlineService, e := exactonline.NewService(division, exactOnlineServiceID, exactOnlineServiceSecret, bigQueryService)
+type ServiceConfig struct {
+	ClientID                string
+	Division                int32
+	ExactOnlineClientID     string
+	ExactOnlineClientSecret string
+	MaxRetries              *uint
+	SecondsBetweenRetries   *uint32
+}
+
+func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
+	exactOnlineServiceConfig := exactonline.ServiceConfig{
+		Division:     serviceConfig.Division,
+		ClientID:     serviceConfig.ExactOnlineClientID,
+		ClientSecret: serviceConfig.ExactOnlineClientSecret,
+	}
+
+	exactonlineService, e := exactonline.NewService(exactOnlineServiceConfig, bigQueryService)
 	if e != nil {
 		return nil, e
 	}
 
 	exactonlineBQService := Service{}
 
-	exactonlineBQService.BudgetService = budget.NewService(clientID, exactonlineService)
-	exactonlineBQService.CRMService = crm.NewService(clientID, exactonlineService)
-	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(clientID, exactonlineService)
-	exactonlineBQService.LogisticsService = logistics.NewService(clientID, exactonlineService)
-	exactonlineBQService.SalesOrderService = salesorder.NewService(clientID, exactonlineService)
+	exactonlineBQService.BudgetService = budget.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.CRMService = crm.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.LogisticsService = logistics.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.SalesOrderService = salesorder.NewService(serviceConfig.ClientID, exactonlineService)
 
 	return &exactonlineBQService, nil
 
