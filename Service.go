@@ -6,6 +6,8 @@ import (
 	crm "github.com/leapforce-libraries/go_exactonline_bq/crm"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_bq/financialtransaction"
 	logistics "github.com/leapforce-libraries/go_exactonline_bq/logistics"
+	purchaseentry "github.com/leapforce-libraries/go_exactonline_bq/purchaseentry"
+	purchaseorder "github.com/leapforce-libraries/go_exactonline_bq/purchaseorder"
 	salesorder "github.com/leapforce-libraries/go_exactonline_bq/salesorder"
 	exactonline "github.com/leapforce-libraries/go_exactonline_new"
 	bigquery "github.com/leapforce-libraries/go_google/bigquery"
@@ -16,6 +18,8 @@ type Service struct {
 	CRMService                  *crm.Service
 	FinancialTransactionService *financialtransaction.Service
 	LogisticsService            *logistics.Service
+	PurchaseEntryService        *purchaseentry.Service
+	PurchaseOrderService        *purchaseorder.Service
 	SalesOrderService           *salesorder.Service
 }
 
@@ -24,8 +28,6 @@ type ServiceConfig struct {
 	Division                int32
 	ExactOnlineClientID     string
 	ExactOnlineClientSecret string
-	MaxRetries              *uint
-	SecondsBetweenRetries   *uint32
 }
 
 func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
@@ -46,6 +48,8 @@ func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) 
 	exactonlineBQService.CRMService = crm.NewService(serviceConfig.ClientID, exactonlineService)
 	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(serviceConfig.ClientID, exactonlineService)
 	exactonlineBQService.LogisticsService = logistics.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.PurchaseEntryService = purchaseentry.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.PurchaseOrderService = purchaseorder.NewService(serviceConfig.ClientID, exactonlineService)
 	exactonlineBQService.SalesOrderService = salesorder.NewService(serviceConfig.ClientID, exactonlineService)
 
 	return &exactonlineBQService, nil
