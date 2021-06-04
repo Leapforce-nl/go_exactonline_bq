@@ -25,22 +25,9 @@ type Service struct {
 	SyncService                 *sync.Service
 }
 
-type ServiceConfig struct {
-	Division                int32
-	ExactOnlineClientID     string
-	ExactOnlineClientSecret string
-}
-
-func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
-	exactOnlineServiceConfig := exactonline.ServiceConfig{
-		Division:     serviceConfig.Division,
-		ClientID:     serviceConfig.ExactOnlineClientID,
-		ClientSecret: serviceConfig.ExactOnlineClientSecret,
-	}
-
-	exactonlineService, e := exactonline.NewService(&exactOnlineServiceConfig, bigQueryService)
-	if e != nil {
-		return nil, e
+func NewService(exactonlineService *exactonline.Service, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
+	if exactonlineService == nil {
+		return nil, nil
 	}
 
 	exactonlineBQService := Service{}
@@ -55,5 +42,4 @@ func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) 
 	exactonlineBQService.SyncService = sync.NewService(exactonlineService)
 
 	return &exactonlineBQService, nil
-
 }
