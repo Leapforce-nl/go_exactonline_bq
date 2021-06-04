@@ -14,8 +14,9 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type PurchaseOrderBQ struct {
-	ClientID                      string
+type PurchaseOrder struct {
+	OrganisationID_               int64
+	SoftwareClientLicenceID_      int64
 	PurchaseOrderID               string
 	AmountDC                      float64
 	AmountFC                      float64
@@ -69,9 +70,10 @@ type PurchaseOrderBQ struct {
 	YourRef                       string
 }
 
-func getPurchaseOrderBQ(c *purchaseorder.PurchaseOrder, clientID string) PurchaseOrderBQ {
-	return PurchaseOrderBQ{
-		clientID,
+func getPurchaseOrder(c *purchaseorder.PurchaseOrder, organisationID int64, softwareClientLicenceID int64) PurchaseOrder {
+	return PurchaseOrder{
+		organisationID,
+		softwareClientLicenceID,
 		c.PurchaseOrderID.String(),
 		c.AmountDC,
 		c.AmountFC,
@@ -126,7 +128,7 @@ func getPurchaseOrderBQ(c *purchaseorder.PurchaseOrder, clientID string) Purchas
 	}
 }
 
-func (service *Service) WritePurchaseOrdersBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseOrders(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -161,7 +163,7 @@ func (service *Service) WritePurchaseOrdersBQ(bucketHandle *storage.BucketHandle
 		for _, tl := range *purchaseOrders {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseOrderBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getPurchaseOrder(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -187,7 +189,7 @@ func (service *Service) WritePurchaseOrdersBQ(bucketHandle *storage.BucketHandle
 			}
 			w = nil
 
-			fmt.Printf("#PurchaseOrders for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#PurchaseOrders flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -204,7 +206,7 @@ func (service *Service) WritePurchaseOrdersBQ(bucketHandle *storage.BucketHandle
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#PurchaseOrders for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#PurchaseOrders: %v\n", rowCount)
 
-	return objectHandles, rowCount, PurchaseOrderBQ{}, nil
+	return objectHandles, rowCount, PurchaseOrder{}, nil
 }

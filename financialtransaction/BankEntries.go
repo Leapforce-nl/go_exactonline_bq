@@ -15,9 +15,10 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type BankEntryBQ struct {
-	ClientID string
-	EntryID  string
+type BankEntry struct {
+	OrganisationID_          int64
+	SoftwareClientLicenceID_ int64
+	EntryID                  string
 	//BankEntryLines
 	BankStatementDocument        string
 	BankStatementDocumentNumber  int32
@@ -37,9 +38,10 @@ type BankEntryBQ struct {
 	StatusDescription            string
 }
 
-func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntryBQ {
-	return BankEntryBQ{
-		clientID,
+func getBankEntry(c *financialtransaction.BankEntry, organisationID int64, softwareClientLicenceID int64) BankEntry {
+	return BankEntry{
+		organisationID,
+		softwareClientLicenceID,
 		c.EntryID.String(),
 		//c.BankEntryLines,
 		c.BankStatementDocument.String(),
@@ -61,7 +63,7 @@ func getBankEntryBQ(c *financialtransaction.BankEntry, clientID string) BankEntr
 	}
 }
 
-func (service *Service) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBankEntries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -96,7 +98,7 @@ func (service *Service) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, l
 		for _, tl := range *bankEntries {
 			batchRowCount++
 
-			b, err := json.Marshal(getBankEntryBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getBankEntry(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -122,7 +124,7 @@ func (service *Service) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, l
 			}
 			w = nil
 
-			fmt.Printf("#BankEntries for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#BankEntries flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -139,7 +141,7 @@ func (service *Service) WriteBankEntriesBQ(bucketHandle *storage.BucketHandle, l
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#BankEntries for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#BankEntries: %v\n", rowCount)
 
-	return objectHandles, rowCount, BankEntryBQ{}, nil
+	return objectHandles, rowCount, BankEntry{}, nil
 }

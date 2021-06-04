@@ -6,18 +6,13 @@ import (
 )
 
 type Service struct {
-	clientID           string
 	exactOnlineService *eo.Service
 }
 
-func NewService(clientID string, exactOnlineService *eo.Service) *Service {
-	return &Service{clientID, exactOnlineService}
+func NewService(exactOnlineService *eo.Service) *Service {
+	return &Service{exactOnlineService}
 }
 
 func (service *Service) PurchaseOrderService() *ep.Service {
 	return service.exactOnlineService.PurchaseOrderService
-}
-
-func (service *Service) ClientID() string {
-	return service.clientID
 }

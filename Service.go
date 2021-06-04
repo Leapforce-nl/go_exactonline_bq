@@ -9,6 +9,7 @@ import (
 	purchaseentry "github.com/leapforce-libraries/go_exactonline_bq/purchaseentry"
 	purchaseorder "github.com/leapforce-libraries/go_exactonline_bq/purchaseorder"
 	salesorder "github.com/leapforce-libraries/go_exactonline_bq/salesorder"
+	sync "github.com/leapforce-libraries/go_exactonline_bq/sync"
 	exactonline "github.com/leapforce-libraries/go_exactonline_new"
 	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 )
@@ -21,10 +22,10 @@ type Service struct {
 	PurchaseEntryService        *purchaseentry.Service
 	PurchaseOrderService        *purchaseorder.Service
 	SalesOrderService           *salesorder.Service
+	SyncService                 *sync.Service
 }
 
 type ServiceConfig struct {
-	ClientID                string
 	Division                int32
 	ExactOnlineClientID     string
 	ExactOnlineClientSecret string
@@ -37,20 +38,21 @@ func NewService(serviceConfig ServiceConfig, bigQueryService *bigquery.Service) 
 		ClientSecret: serviceConfig.ExactOnlineClientSecret,
 	}
 
-	exactonlineService, e := exactonline.NewService(exactOnlineServiceConfig, bigQueryService)
+	exactonlineService, e := exactonline.NewService(&exactOnlineServiceConfig, bigQueryService)
 	if e != nil {
 		return nil, e
 	}
 
 	exactonlineBQService := Service{}
 
-	exactonlineBQService.BudgetService = budget.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.CRMService = crm.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.LogisticsService = logistics.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.PurchaseEntryService = purchaseentry.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.PurchaseOrderService = purchaseorder.NewService(serviceConfig.ClientID, exactonlineService)
-	exactonlineBQService.SalesOrderService = salesorder.NewService(serviceConfig.ClientID, exactonlineService)
+	exactonlineBQService.BudgetService = budget.NewService(exactonlineService)
+	exactonlineBQService.CRMService = crm.NewService(exactonlineService)
+	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(exactonlineService)
+	exactonlineBQService.LogisticsService = logistics.NewService(exactonlineService)
+	exactonlineBQService.PurchaseEntryService = purchaseentry.NewService(exactonlineService)
+	exactonlineBQService.PurchaseOrderService = purchaseorder.NewService(exactonlineService)
+	exactonlineBQService.SalesOrderService = salesorder.NewService(exactonlineService)
+	exactonlineBQService.SyncService = sync.NewService(exactonlineService)
 
 	return &exactonlineBQService, nil
 

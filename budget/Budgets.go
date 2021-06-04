@@ -15,8 +15,9 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type BudgetBQ struct {
-	ClientID                  string
+type Budget struct {
+	OrganisationID_           int64
+	SoftwareClientLicenceID_  int64
 	ID                        string
 	AmountDC                  float64
 	BudgetScenario            string
@@ -44,9 +45,10 @@ type BudgetBQ struct {
 	ReportingYear             int16
 }
 
-func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
-	return BudgetBQ{
-		clientID,
+func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID int64) Budget {
+	return Budget{
+		organisationID,
+		softwareClientLicenceID,
 		c.ID.String(),
 		c.AmountDC,
 		c.BudgetScenario.String(),
@@ -75,7 +77,7 @@ func getBudgetBQ(c *budget.Budget, clientID string) BudgetBQ {
 	}
 }
 
-func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -110,7 +112,7 @@ func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastM
 		for _, tl := range *budgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getBudgetBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getBudget(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -136,7 +138,7 @@ func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastM
 			}
 			w = nil
 
-			fmt.Printf("#Budgets for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#Budgets for flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -153,7 +155,7 @@ func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, lastM
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Budgets for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#Budgets: %v\n", rowCount)
 
-	return objectHandles, rowCount, BudgetBQ{}, nil
+	return objectHandles, rowCount, Budget{}, nil
 }

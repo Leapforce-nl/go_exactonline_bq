@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
-	_bigquery "cloud.google.com/go/bigquery"
+	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
-
 	errortools "github.com/leapforce-libraries/go_errortools"
-	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
-	bigquery "github.com/leapforce-libraries/go_google/bigquery"
+	sync "github.com/leapforce-libraries/go_exactonline_new/sync"
+	go_bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type TransactionLineBQ struct {
-	ClientID                  string
+type FinancialTransactionLine struct {
+	OrganisationID_           int64
+	SoftwareClientLicenceID_  int64
+	Timestamp                 int64
 	ID                        string
 	Account                   string
 	AccountCode               string
@@ -32,17 +32,17 @@ type TransactionLineBQ struct {
 	CostCenterDescription     string
 	CostUnit                  string
 	CostUnitDescription       string
-	Created                   _bigquery.NullTimestamp
+	Created                   bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	Currency                  string
-	Date                      _bigquery.NullTimestamp
+	Date                      bigquery.NullTimestamp
 	Description               string
 	Division                  int64
 	Document                  string
 	DocumentNumber            int64
 	DocumentSubject           string
-	DueDate                   _bigquery.NullTimestamp
+	DueDate                   bigquery.NullTimestamp
 	EntryID                   string
 	EntryNumber               int64
 	ExchangeRate              float64
@@ -61,7 +61,7 @@ type TransactionLineBQ struct {
 	JournalDescription        string
 	LineNumber                int64
 	LineType                  int64
-	Modified                  _bigquery.NullTimestamp
+	Modified                  bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	Notes                     string
@@ -87,9 +87,16 @@ type TransactionLineBQ struct {
 	YourRef                   string
 }
 
-func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID string) TransactionLineBQ {
-	return TransactionLineBQ{
-		clientID,
+func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) FinancialTransactionLine {
+	timestamp := c.Timestamp.Value()
+	if timestamp > *maxTimestamp {
+		*maxTimestamp = timestamp
+	}
+
+	return FinancialTransactionLine{
+		organisationID,
+		softwareClientLicenceID,
+		c.Timestamp.Value(),
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountCode,
@@ -105,17 +112,17 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.CostCenterDescription,
 		c.CostUnit,
 		c.CostUnitDescription,
-		bigquery.DateToNullTimestamp(c.Created),
+		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
-		bigquery.DateToNullTimestamp(c.Date),
+		go_bigquery.DateToNullTimestamp(c.Date),
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
-		bigquery.DateToNullTimestamp(c.DueDate),
+		go_bigquery.DateToNullTimestamp(c.DueDate),
 		c.EntryID.String(),
 		c.EntryNumber,
 		c.ExchangeRate,
@@ -134,7 +141,7 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.JournalDescription,
 		c.LineNumber,
 		c.LineType,
-		bigquery.DateToNullTimestamp(c.Modified),
+		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,
@@ -161,24 +168,26 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 	}
 }
 
-func (service *Service) WriteTransactionLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
-		return nil, 0, nil, nil
+		return nil, nil, nil
 	}
 
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := service.FinancialTransactionService().NewGetTransactionLinesCall(lastModified)
+	call := service.SyncService().NewSyncFinancialTransactionLinesCall(&timestamp)
 
 	rowCount := 0
 	batchRowCount := 0
 	batchSize := 10000
 
+	maxTimestamp := int64(0)
+
 	for true {
 		transactionLines, e := call.Do()
 		if e != nil {
-			return nil, 0, nil, e
+			return nil, nil, e
 		}
 
 		if transactionLines == nil {
@@ -196,21 +205,21 @@ func (service *Service) WriteTransactionLinesBQ(bucketHandle *storage.BucketHand
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getTransactionLineBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getFinancialTransactionLine(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write data
 			_, err = w.Write(b)
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write NewLine
 			_, err = fmt.Fprintf(w, "\n")
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 		}
 
@@ -218,11 +227,11 @@ func (service *Service) WriteTransactionLinesBQ(bucketHandle *storage.BucketHand
 			// Close and flush data
 			err := w.Close()
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 			w = nil
 
-			fmt.Printf("#TransactionLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#FinancialTransactionLines flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -233,13 +242,13 @@ func (service *Service) WriteTransactionLinesBQ(bucketHandle *storage.BucketHand
 		// Close and flush data
 		err := w.Close()
 		if err != nil {
-			return nil, 0, nil, errortools.ErrorMessage(err)
+			return nil, nil, errortools.ErrorMessage(err)
 		}
 
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#TransactionLines for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#FinancialTransactionLines: %v\n", rowCount)
 
-	return objectHandles, rowCount, TransactionLineBQ{}, nil
+	return objectHandles, &maxTimestamp, nil
 }

@@ -15,8 +15,9 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type PlannedSalesReturnBQ struct {
-	ClientID                         string
+type PlannedSalesReturn struct {
+	OrganisationID_                  int64
+	SoftwareClientLicenceID_         int64
 	PlannedSalesReturnID             string
 	Created                          bigquery.NullTimestamp
 	Creator                          string
@@ -44,9 +45,10 @@ type PlannedSalesReturnBQ struct {
 	WarehouseDescription string
 }
 
-func getPlannedSalesReturnBQ(c *salesorder.PlannedSalesReturn, clientID string) PlannedSalesReturnBQ {
-	return PlannedSalesReturnBQ{
-		clientID,
+func getPlannedSalesReturn(c *salesorder.PlannedSalesReturn, organisationID int64, softwareClientLicenceID int64) PlannedSalesReturn {
+	return PlannedSalesReturn{
+		organisationID,
+		softwareClientLicenceID,
 		c.PlannedSalesReturnID.String(),
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
@@ -75,7 +77,7 @@ func getPlannedSalesReturnBQ(c *salesorder.PlannedSalesReturn, clientID string) 
 	}
 }
 
-func (service *Service) WritePlannedSalesReturnsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePlannedSalesReturns(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -110,7 +112,7 @@ func (service *Service) WritePlannedSalesReturnsBQ(bucketHandle *storage.BucketH
 		for _, tl := range *plannedSalesReturns {
 			batchRowCount++
 
-			b, err := json.Marshal(getPlannedSalesReturnBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getPlannedSalesReturn(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -136,7 +138,7 @@ func (service *Service) WritePlannedSalesReturnsBQ(bucketHandle *storage.BucketH
 			}
 			w = nil
 
-			fmt.Printf("#PlannedSalesReturns for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#PlannedSalesReturns flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -153,7 +155,7 @@ func (service *Service) WritePlannedSalesReturnsBQ(bucketHandle *storage.BucketH
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#PlannedSalesReturns for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#PlannedSalesReturns: %v\n", rowCount)
 
-	return objectHandles, rowCount, PlannedSalesReturnBQ{}, nil
+	return objectHandles, rowCount, PlannedSalesReturn{}, nil
 }

@@ -14,8 +14,9 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type PurchaseEntryBQ struct {
-	ClientID                    string
+type PurchaseEntry struct {
+	OrganisationID_             int64
+	SoftwareClientLicenceID_    int64
 	EntryID                     string
 	AmountDC                    float64
 	AmountFC                    float64
@@ -61,9 +62,10 @@ type PurchaseEntryBQ struct {
 	YourRef                     string
 }
 
-func getPurchaseEntryBQ(c *purchaseentry.PurchaseEntry, clientID string) PurchaseEntryBQ {
-	return PurchaseEntryBQ{
-		clientID,
+func getPurchaseEntry(c *purchaseentry.PurchaseEntry, organisationID int64, softwareClientLicenceID int64) PurchaseEntry {
+	return PurchaseEntry{
+		organisationID,
+		softwareClientLicenceID,
 		c.EntryID.String(),
 		c.AmountDC,
 		c.AmountFC,
@@ -110,7 +112,7 @@ func getPurchaseEntryBQ(c *purchaseentry.PurchaseEntry, clientID string) Purchas
 	}
 }
 
-func (service *Service) WritePurchaseEntriesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseEntries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -145,7 +147,7 @@ func (service *Service) WritePurchaseEntriesBQ(bucketHandle *storage.BucketHandl
 		for _, tl := range *purchaseEntries {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseEntryBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getPurchaseEntry(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -171,7 +173,7 @@ func (service *Service) WritePurchaseEntriesBQ(bucketHandle *storage.BucketHandl
 			}
 			w = nil
 
-			fmt.Printf("#PurchaseEntries for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#PurchaseEntries flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -188,7 +190,7 @@ func (service *Service) WritePurchaseEntriesBQ(bucketHandle *storage.BucketHandl
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#PurchaseEntries for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#PurchaseEntries: %v\n", rowCount)
 
-	return objectHandles, rowCount, PurchaseEntryBQ{}, nil
+	return objectHandles, rowCount, PurchaseEntry{}, nil
 }

@@ -15,57 +15,59 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type BankEntryLineBQ struct {
-	ClientID              string
-	ID                    string
-	Account               string
-	AccountCode           string
-	AccountName           string
-	AmountDC              float64
-	AmountFC              float64
-	AmountVATFC           float64
-	Asset                 string
-	AssetCode             string
-	AssetDescription      string
-	CostCenter            string
-	CostCenterDescription string
-	CostUnit              string
-	CostUnitDescription   string
-	Created               _bigquery.NullTimestamp
-	Creator               string
-	CreatorFullName       string
-	Date                  _bigquery.NullTimestamp
-	Description           string
-	Division              int32
-	Document              string
-	DocumentNumber        int32
-	DocumentSubject       string
-	EntryID               string
-	EntryNumber           int32
-	ExchangeRate          float64
-	GLAccount             string
-	GLAccountCode         string
-	GLAccountDescription  string
-	LineNumber            int32
-	Modified              _bigquery.NullTimestamp
-	Modifier              string
-	ModifierFullName      string
-	Notes                 string
-	OffsetID              string
-	OurRef                int32
-	Project               string
-	ProjectCode           string
-	ProjectDescription    string
-	Quantity              float64
-	VATCode               string
-	VATCodeDescription    string
-	VATPercentage         float64
-	VATType               string
+type BankEntryLine struct {
+	OrganisationID_          int64
+	SoftwareClientLicenceID_ int64
+	ID                       string
+	Account                  string
+	AccountCode              string
+	AccountName              string
+	AmountDC                 float64
+	AmountFC                 float64
+	AmountVATFC              float64
+	Asset                    string
+	AssetCode                string
+	AssetDescription         string
+	CostCenter               string
+	CostCenterDescription    string
+	CostUnit                 string
+	CostUnitDescription      string
+	Created                  _bigquery.NullTimestamp
+	Creator                  string
+	CreatorFullName          string
+	Date                     _bigquery.NullTimestamp
+	Description              string
+	Division                 int32
+	Document                 string
+	DocumentNumber           int32
+	DocumentSubject          string
+	EntryID                  string
+	EntryNumber              int32
+	ExchangeRate             float64
+	GLAccount                string
+	GLAccountCode            string
+	GLAccountDescription     string
+	LineNumber               int32
+	Modified                 _bigquery.NullTimestamp
+	Modifier                 string
+	ModifierFullName         string
+	Notes                    string
+	OffsetID                 string
+	OurRef                   int32
+	Project                  string
+	ProjectCode              string
+	ProjectDescription       string
+	Quantity                 float64
+	VATCode                  string
+	VATCodeDescription       string
+	VATPercentage            float64
+	VATType                  string
 }
 
-func getBankEntryLineBQ(c *financialtransaction.BankEntryLine, clientID string) BankEntryLineBQ {
-	return BankEntryLineBQ{
-		clientID,
+func getBankEntryLine(c *financialtransaction.BankEntryLine, organisationID int64, softwareClientLicenceID int64) BankEntryLine {
+	return BankEntryLine{
+		organisationID,
+		softwareClientLicenceID,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountCode,
@@ -113,7 +115,7 @@ func getBankEntryLineBQ(c *financialtransaction.BankEntryLine, clientID string) 
 	}
 }
 
-func (service *Service) WriteBankEntryLinesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBankEntryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -148,7 +150,7 @@ func (service *Service) WriteBankEntryLinesBQ(bucketHandle *storage.BucketHandle
 		for _, tl := range *bankEntryLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getBankEntryLineBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getBankEntryLine(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -174,7 +176,7 @@ func (service *Service) WriteBankEntryLinesBQ(bucketHandle *storage.BucketHandle
 			}
 			w = nil
 
-			fmt.Printf("#BankEntryLines for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#BankEntryLines flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -191,7 +193,7 @@ func (service *Service) WriteBankEntryLinesBQ(bucketHandle *storage.BucketHandle
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#BankEntryLines for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#BankEntryLines: %v\n", rowCount)
 
-	return objectHandles, rowCount, BankEntryLineBQ{}, nil
+	return objectHandles, rowCount, BankEntryLine{}, nil
 }

@@ -4,19 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
-	_bigquery "cloud.google.com/go/bigquery"
+	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
-
 	errortools "github.com/leapforce-libraries/go_errortools"
-	crm "github.com/leapforce-libraries/go_exactonline_new/crm"
-	bigquery "github.com/leapforce-libraries/go_google/bigquery"
+	sync "github.com/leapforce-libraries/go_exactonline_new/sync"
+	go_bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type ContactBQ struct {
-	ClientID                  string
+type CRMContact struct {
+	OrganisationID_           int64
+	SoftwareClientLicenceID_  int64
+	Timestamp                 int64
 	ID                        string
 	Account                   string
 	AccountIsCustomer         bool
@@ -28,7 +28,7 @@ type ContactBQ struct {
 	AddressStreetNumber       string
 	AddressStreetNumberSuffix string
 	AllowMailing              int32
-	BirthDate                 _bigquery.NullTimestamp
+	BirthDate                 bigquery.NullTimestamp
 	BirthName                 string
 	BirthNamePrefix           string
 	BirthPlace                string
@@ -40,17 +40,17 @@ type ContactBQ struct {
 	City                      string
 	Code                      string
 	Country                   string
-	Created                   _bigquery.NullTimestamp
+	Created                   bigquery.NullTimestamp
 	Creator                   string
 	CreatorFullName           string
 	Division                  int32
 	Email                     string
-	EndDate                   _bigquery.NullTimestamp
+	EndDate                   bigquery.NullTimestamp
 	FirstName                 string
 	FullName                  string
 	Gender                    string
 	HID                       int32
-	IdentificationDate        _bigquery.NullTimestamp
+	IdentificationDate        bigquery.NullTimestamp
 	IdentificationDocument    string
 	IdentificationUser        string
 	Initials                  string
@@ -65,7 +65,7 @@ type ContactBQ struct {
 	MarketingNotes            string
 	MiddleName                string
 	Mobile                    string
-	Modified                  _bigquery.NullTimestamp
+	Modified                  bigquery.NullTimestamp
 	Modifier                  string
 	ModifierFullName          string
 	Nationality               string
@@ -80,14 +80,21 @@ type ContactBQ struct {
 	PictureUrl                string
 	Postcode                  string
 	SocialSecurityNumber      string
-	StartDate                 _bigquery.NullTimestamp
+	StartDate                 bigquery.NullTimestamp
 	State                     string
 	Title                     string
 }
 
-func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
-	return ContactBQ{
-		clientID,
+func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) CRMContact {
+	timestamp := c.Timestamp.Value()
+	if timestamp > *maxTimestamp {
+		*maxTimestamp = timestamp
+	}
+
+	return CRMContact{
+		organisationID,
+		softwareClientLicenceID,
+		timestamp,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountIsCustomer,
@@ -99,7 +106,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.AddressStreetNumber,
 		c.AddressStreetNumberSuffix,
 		c.AllowMailing,
-		bigquery.DateToNullTimestamp(c.BirthDate),
+		go_bigquery.DateToNullTimestamp(c.BirthDate),
 		c.BirthName,
 		c.BirthNamePrefix,
 		c.BirthPlace,
@@ -111,17 +118,17 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.City,
 		c.Code,
 		c.Country,
-		bigquery.DateToNullTimestamp(c.Created),
+		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Division,
 		c.Email,
-		bigquery.DateToNullTimestamp(c.EndDate),
+		go_bigquery.DateToNullTimestamp(c.EndDate),
 		c.FirstName,
 		c.FullName,
 		c.Gender,
 		c.HID,
-		bigquery.DateToNullTimestamp(c.IdentificationDate),
+		go_bigquery.DateToNullTimestamp(c.IdentificationDate),
 		c.IdentificationDocument.String(),
 		c.IdentificationUser.String(),
 		c.Initials,
@@ -136,7 +143,7 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.MarketingNotes,
 		c.MiddleName,
 		c.Mobile,
-		bigquery.DateToNullTimestamp(c.Modified),
+		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Nationality,
@@ -151,37 +158,35 @@ func getContactBQ(c *crm.Contact, clientID string) ContactBQ {
 		c.PictureUrl,
 		c.Postcode,
 		c.SocialSecurityNumber,
-		bigquery.DateToNullTimestamp(c.StartDate),
+		go_bigquery.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.Title,
 	}
 }
 
-func (service *Service) WriteContactsBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteCRMContacts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
-		return nil, 0, nil, nil
+		return nil, nil, nil
 	}
 
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	getContactsCallParams := crm.GetContactsCallParams{
-		ModifiedAfter: lastModified,
-	}
-
-	call := service.CRMService().NewGetContactsCall(&getContactsCallParams)
+	call := service.SyncService().NewSyncCRMContactsCall(&timestamp)
 
 	rowCount := 0
 	batchRowCount := 0
 	batchSize := 10000
 
+	maxTimestamp := int64(0)
+
 	for true {
-		contacts, e := call.Do()
+		transactionLines, e := call.Do()
 		if e != nil {
-			return nil, 0, nil, e
+			return nil, nil, e
 		}
 
-		if contacts == nil {
+		if transactionLines == nil {
 			break
 		}
 
@@ -193,24 +198,24 @@ func (service *Service) WriteContactsBQ(bucketHandle *storage.BucketHandle, last
 			w = objectHandle.NewWriter(context.Background())
 		}
 
-		for _, tl := range *contacts {
+		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getContactBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getCRMContact(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write data
 			_, err = w.Write(b)
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write NewLine
 			_, err = fmt.Fprintf(w, "\n")
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 		}
 
@@ -218,11 +223,11 @@ func (service *Service) WriteContactsBQ(bucketHandle *storage.BucketHandle, last
 			// Close and flush data
 			err := w.Close()
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 			w = nil
 
-			fmt.Printf("#Contacts for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#CRMContacts flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -233,13 +238,13 @@ func (service *Service) WriteContactsBQ(bucketHandle *storage.BucketHandle, last
 		// Close and flush data
 		err := w.Close()
 		if err != nil {
-			return nil, 0, nil, errortools.ErrorMessage(err)
+			return nil, nil, errortools.ErrorMessage(err)
 		}
 
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#Contacts for client %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#CRMContacts: %v\n", rowCount)
 
-	return objectHandles, rowCount, ContactBQ{}, nil
+	return objectHandles, &maxTimestamp, nil
 }

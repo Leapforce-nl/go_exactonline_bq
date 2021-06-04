@@ -4,94 +4,103 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
-	_bigquery "cloud.google.com/go/bigquery"
+	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
-
 	errortools "github.com/leapforce-libraries/go_errortools"
-	logistics "github.com/leapforce-libraries/go_exactonline_new/logistics"
-	bigquery "github.com/leapforce-libraries/go_google/bigquery"
+	sync "github.com/leapforce-libraries/go_exactonline_new/sync"
+	go_bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type SalesItemPriceBQ struct {
-	ClientID                   string
+type LogisticsSalesItemPrice struct {
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	Timestamp                  int64
 	ID                         string
 	Account                    string
 	AccountName                string
-	Created                    _bigquery.NullTimestamp
+	Created                    bigquery.NullTimestamp
 	Creator                    string
 	CreatorFullName            string
 	Currency                   string
 	DefaultItemUnit            string
 	DefaultItemUnitDescription string
 	Division                   int32
-	EndDate                    _bigquery.NullTimestamp
+	EndDate                    bigquery.NullTimestamp
 	Item                       string
 	ItemCode                   string
 	ItemDescription            string
-	Modified                   _bigquery.NullTimestamp
+	Modified                   bigquery.NullTimestamp
 	Modifier                   string
 	ModifierFullName           string
 	NumberOfItemsPerUnit       float64
 	Price                      float64
 	Quantity                   float64
-	StartDate                  _bigquery.NullTimestamp
+	StartDate                  bigquery.NullTimestamp
 	Unit                       string
 	UnitDescription            string
 }
 
-func getSalesItemPriceBQ(c *logistics.SalesItemPrice, clientID string) SalesItemPriceBQ {
-	return SalesItemPriceBQ{
-		clientID,
+func getLogisticsSalesItemPrice(c *sync.LogisticsSalesItemPrice, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) LogisticsSalesItemPrice {
+	timestamp := c.Timestamp.Value()
+	if timestamp > *maxTimestamp {
+		*maxTimestamp = timestamp
+	}
+
+	return LogisticsSalesItemPrice{
+		organisationID,
+		softwareClientLicenceID,
+		timestamp,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountName,
-		bigquery.DateToNullTimestamp(c.Created),
+		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
 		c.DefaultItemUnit,
 		c.DefaultItemUnitDescription,
 		c.Division,
-		bigquery.DateToNullTimestamp(c.EndDate),
+		go_bigquery.DateToNullTimestamp(c.EndDate),
 		c.Item.String(),
 		c.ItemCode,
 		c.ItemDescription,
-		bigquery.DateToNullTimestamp(c.Modified),
+		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.NumberOfItemsPerUnit,
 		c.Price,
 		c.Quantity,
-		bigquery.DateToNullTimestamp(c.StartDate),
+		go_bigquery.DateToNullTimestamp(c.StartDate),
 		c.Unit,
 		c.UnitDescription,
 	}
 }
 
-func (service *Service) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandle, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteLogisticsSalesItemPrices(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
-		return nil, 0, nil, nil
+		return nil, nil, nil
 	}
 
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := service.LogisticsService().NewGetSalesItemPricesCall(lastModified)
+	call := service.SyncService().NewSyncLogisticsSalesItemPricesCall(&timestamp)
 
 	rowCount := 0
 	batchRowCount := 0
 	batchSize := 10000
 
+	maxTimestamp := int64(0)
+
 	for true {
-		salesItemPrices, e := call.Do()
+		transactionLines, e := call.Do()
 		if e != nil {
-			return nil, 0, nil, e
+			return nil, nil, e
 		}
 
-		if salesItemPrices == nil {
+		if transactionLines == nil {
 			break
 		}
 
@@ -103,24 +112,24 @@ func (service *Service) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandl
 			w = objectHandle.NewWriter(context.Background())
 		}
 
-		for _, tl := range *salesItemPrices {
+		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesItemPriceBQ(&tl, service.ClientID()))
+			b, err := json.Marshal(getLogisticsSalesItemPrice(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write data
 			_, err = w.Write(b)
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 
 			// Write NewLine
 			_, err = fmt.Fprintf(w, "\n")
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 		}
 
@@ -128,11 +137,11 @@ func (service *Service) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandl
 			// Close and flush data
 			err := w.Close()
 			if err != nil {
-				return nil, 0, nil, errortools.ErrorMessage(err)
+				return nil, nil, errortools.ErrorMessage(err)
 			}
 			w = nil
 
-			fmt.Printf("#SalesItemPrices for service %s flushed: %v\n", service.ClientID(), batchRowCount)
+			fmt.Printf("#LogisticsSalesItemPrices flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -143,13 +152,13 @@ func (service *Service) WriteSalesItemPricesBQ(bucketHandle *storage.BucketHandl
 		// Close and flush data
 		err := w.Close()
 		if err != nil {
-			return nil, 0, nil, errortools.ErrorMessage(err)
+			return nil, nil, errortools.ErrorMessage(err)
 		}
 
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#SalesItemPrices for service %s: %v\n", service.ClientID(), rowCount)
+	fmt.Printf("#LogisticsSalesItemPrices: %v\n", rowCount)
 
-	return objectHandles, rowCount, SalesItemPriceBQ{}, nil
+	return objectHandles, &maxTimestamp, nil
 }
