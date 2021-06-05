@@ -2,8 +2,11 @@ package exactonline_bq
 
 import (
 	errortools "github.com/leapforce-libraries/go_errortools"
+	assets "github.com/leapforce-libraries/go_exactonline_bq/assets"
 	budget "github.com/leapforce-libraries/go_exactonline_bq/budget"
+	cashflow "github.com/leapforce-libraries/go_exactonline_bq/cashflow"
 	crm "github.com/leapforce-libraries/go_exactonline_bq/crm"
+	financial "github.com/leapforce-libraries/go_exactonline_bq/financial"
 	financialtransaction "github.com/leapforce-libraries/go_exactonline_bq/financialtransaction"
 	logistics "github.com/leapforce-libraries/go_exactonline_bq/logistics"
 	purchaseentry "github.com/leapforce-libraries/go_exactonline_bq/purchaseentry"
@@ -15,8 +18,11 @@ import (
 )
 
 type Service struct {
+	AssetsService               *assets.Service
 	BudgetService               *budget.Service
+	CashflowService             *cashflow.Service
 	CRMService                  *crm.Service
+	FinancialService            *financial.Service
 	FinancialTransactionService *financialtransaction.Service
 	LogisticsService            *logistics.Service
 	PurchaseEntryService        *purchaseentry.Service
@@ -32,8 +38,11 @@ func NewService(exactonlineService *exactonline.Service, bigQueryService *bigque
 
 	exactonlineBQService := Service{}
 
+	exactonlineBQService.AssetsService = assets.NewService(exactonlineService)
 	exactonlineBQService.BudgetService = budget.NewService(exactonlineService)
+	exactonlineBQService.CashflowService = cashflow.NewService(exactonlineService)
 	exactonlineBQService.CRMService = crm.NewService(exactonlineService)
+	exactonlineBQService.FinancialService = financial.NewService(exactonlineService)
 	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(exactonlineService)
 	exactonlineBQService.LogisticsService = logistics.NewService(exactonlineService)
 	exactonlineBQService.PurchaseEntryService = purchaseentry.NewService(exactonlineService)

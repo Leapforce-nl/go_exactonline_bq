@@ -10,3 +10,5 @@ require (
 	github.com/leapforce-libraries/go_google v0.0.0-20210604170955-260603b2ee9f
 	github.com/leapforce-libraries/go_types v0.0.0-20210415100703-687744db463d
 )
+
+replace github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210604210141-4f3dedb25611 => C:\Users\michi\Documents\Development\go\src\github.com\leapforce-libraries\go_exactonline_new
