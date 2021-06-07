@@ -224,7 +224,7 @@ func (service *Service) WritePaymentsBQ(bucketHandle *storage.BucketHandle, orga
 			}
 			w = nil
 
-			fmt.Printf("#Payments for flushed: %v\n", batchRowCount)
+			fmt.Printf("#Payments flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0

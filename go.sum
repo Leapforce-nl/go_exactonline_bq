@@ -451,6 +451,7 @@ github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210604210141-4f3dedb2
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210604210141-4f3dedb25611/go.mod h1:eBTlidh++TnYQk6w8+qcit90EFSWt4PJ2PXTT0zL6xA=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210605194909-4be75e60d990 h1:0I4fUux7J0aoNwDLxObLhL+09vYytkBr1c3BzjVlAsk=
 github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210605210047-3b92a9d20d13 h1:LKaw+fDwPrIR85uy0bmZwRct7qU/b6eC9ytAdG2B8Ic=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20210605220236-76b67f909250 h1:cbCRL7CvZLspSOByWqpf/6LS7aPPN26SHp08WQYCy9E=
 github.com/leapforce-libraries/go_google v0.0.0-20210111150913-7d6be991b5f9 h1:cuV0UCvsWowYv3g7/EnZ4F9FBV+emiVGbffSC1zmhtQ=
 github.com/leapforce-libraries/go_google v0.0.0-20210111150913-7d6be991b5f9/go.mod h1:8S/lP25Mfq12LzEnYELvk/FIQE833ChAS1AYGag2QC4=
 github.com/leapforce-libraries/go_google v0.0.0-20210115093502-e017187122b5 h1:PDlcjkK+DbP1T6XPKPlCrKWOcQzCG+2fiNBTvzm7fUw=
@@ -545,6 +546,8 @@ github.com/leapforce-libraries/go_utilities v0.0.0-20210505125333-18b876c17d79 h
 github.com/leapforce-libraries/go_utilities v0.0.0-20210505125333-18b876c17d79/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
 github.com/leapforce-libraries/go_utilities v0.0.0-20210602102157-b8d055f7e0af h1:vER47brePx/rjqJ9Qfch6EExuk7u+rwnRs98IUlLdPk=
 github.com/leapforce-libraries/go_utilities v0.0.0-20210602102157-b8d055f7e0af/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210607133432-092ce628d77d h1:RgbeCHhA/vmbXGqE9y+0RxE0rRoYKb5bEtB/g5wWIOY=
+github.com/leapforce-libraries/go_utilities v0.0.0-20210607133432-092ce628d77d/go.mod h1:fp9gPd4WpZ62d3/5l+NU6H1XgqpigCGMxLKxFO61vEA=
 github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
