@@ -17,7 +17,6 @@ type FinancialGLAccount struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
 	Timestamp                      int64
-	ID                             string
 	AssimilatedVATBox              int16
 	BalanceSide                    string
 	BalanceType                    string
@@ -35,6 +34,7 @@ type FinancialGLAccount struct {
 	Division                       int32
 	ExcludeVATListing              byte
 	ExpenseNonDeductiblePercentage float64
+	ID                             string
 	IsBlocked                      bool
 	Matching                       bool
 	Modified                       bigquery.NullTimestamp
@@ -69,7 +69,6 @@ func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, sof
 		organisationID,
 		softwareClientLicenceID,
 		c.Timestamp.Value(),
-		c.ID.String(),
 		c.AssimilatedVATBox,
 		c.BalanceSide,
 		c.BalanceType,
@@ -87,6 +86,7 @@ func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, sof
 		c.Division,
 		c.ExcludeVATListing,
 		c.ExpenseNonDeductiblePercentage,
+		c.ID.String(),
 		c.IsBlocked,
 		c.Matching,
 		go_bigquery.DateToNullTimestamp(c.Modified),

@@ -17,7 +17,6 @@ type LogisticsItem struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
 	Timestamp                int64
-	ID                       string
 	AverageCost              float64
 	Barcode                  string
 	Class01                  string
@@ -80,6 +79,7 @@ type LogisticsItem struct {
 	GLStockCode              string
 	GLStockDescription       string
 	GrossWeight              float64
+	ID                       string
 	IsBatchItem              byte
 	IsFractionAllowedItem    bool
 	IsMakeItem               byte
@@ -106,8 +106,8 @@ type LogisticsItem struct {
 	PictureName              string
 	PictureThumbnailURL      string
 	PictureURL               string
-	SalesVatCode             string
-	SalesVatCodeDescription  string
+	SalesVATCode             string
+	SalesVATCodeDescription  string
 	SearchCode               string
 	SecurityLevel            int32
 	StartDate                bigquery.NullTimestamp
@@ -127,7 +127,6 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 		organisationID,
 		softwareClientLicenceID,
 		timestamp,
-		c.ID.String(),
 		c.AverageCost,
 		c.Barcode,
 		c.Class01,
@@ -190,6 +189,7 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 		c.GLStockCode,
 		c.GLStockDescription,
 		c.GrossWeight,
+		c.ID.String(),
 		c.IsBatchItem,
 		c.IsFractionAllowedItem,
 		c.IsMakeItem,
@@ -216,8 +216,8 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 		c.PictureName,
 		c.PictureThumbnailURL,
 		c.PictureURL,
-		c.SalesVatCode,
-		c.SalesVatCodeDescription,
+		c.SalesVATCode,
+		c.SalesVATCodeDescription,
 		c.SearchCode,
 		c.SecurityLevel,
 		go_bigquery.DateToNullTimestamp(c.StartDate),

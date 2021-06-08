@@ -17,7 +17,6 @@ type CRMContact struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
 	Timestamp                 int64
-	ID                        string
 	Account                   string
 	AccountIsCustomer         bool
 	AccountIsSupplier         bool
@@ -50,6 +49,7 @@ type CRMContact struct {
 	FullName                  string
 	Gender                    string
 	HID                       int32
+	ID                        string
 	IdentificationDate        bigquery.NullTimestamp
 	IdentificationDocument    string
 	IdentificationUser        string
@@ -76,8 +76,8 @@ type CRMContact struct {
 	Phone                     string
 	PhoneExtension            string
 	PictureName               string
-	PictureThumbnailUrl       string
-	PictureUrl                string
+	PictureThumbnailURL       string
+	PictureURL                string
 	Postcode                  string
 	SocialSecurityNumber      string
 	StartDate                 bigquery.NullTimestamp
@@ -95,7 +95,6 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 		organisationID,
 		softwareClientLicenceID,
 		timestamp,
-		c.ID.String(),
 		c.Account.String(),
 		c.AccountIsCustomer,
 		c.AccountIsSupplier,
@@ -128,6 +127,7 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 		c.FullName,
 		c.Gender,
 		c.HID,
+		c.ID.String(),
 		go_bigquery.DateToNullTimestamp(c.IdentificationDate),
 		c.IdentificationDocument.String(),
 		c.IdentificationUser.String(),
@@ -154,8 +154,8 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 		c.Phone,
 		c.PhoneExtension,
 		c.PictureName,
-		c.PictureThumbnailUrl,
-		c.PictureUrl,
+		c.PictureThumbnailURL,
+		c.PictureURL,
 		c.Postcode,
 		c.SocialSecurityNumber,
 		go_bigquery.DateToNullTimestamp(c.StartDate),

@@ -17,7 +17,6 @@ type SalesOrderSalesOrder struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
 	Timestamp                      int64
-	ID                             string
 	AmountDC                       float64
 	AmountDiscount                 float64
 	AmountDiscountExclVat          float64
@@ -28,10 +27,16 @@ type SalesOrderSalesOrder struct {
 	Approved                       bigquery.NullTimestamp
 	Approver                       string
 	ApproverFullName               string
+	CostCenter                     string  `json:"CostCenter"`
+	CostCenterDescription          string  `json:"CostCenterDescription"`
+	CostPriceFC                    float64 `json:"CostPriceFC"`
+	CostUnit                       string  `json:"CostUnit"`
+	CostUnitDescription            string  `json:"CostUnitDescription"`
 	Created                        bigquery.NullTimestamp
 	Creator                        string
 	CreatorFullName                string
 	Currency                       string
+	CustomerItemCode               string `json:"CustomerItemCode"`
 	DeliverTo                      string
 	DeliverToContactPerson         string
 	DeliverToContactPersonFullName string
@@ -46,15 +51,25 @@ type SalesOrderSalesOrder struct {
 	Document                       string
 	DocumentNumber                 int32
 	DocumentSubject                string
+	ID                             string
 	InvoiceStatus                  int16
 	InvoiceStatusDescription       string
 	InvoiceTo                      string
 	InvoiceToContactPerson         string
 	InvoiceToContactPersonFullName string
 	InvoiceToName                  string
+	Item                           string
+	ItemCode                       string
+	ItemDescription                string
+	ItemVersion                    string
+	ItemVersionDescription         string
+	LineNumber                     int32
+	Margin                         float64
 	Modified                       bigquery.NullTimestamp
 	Modifier                       string
 	ModifierFullName               string
+	NetPrice                       float64
+	Notes                          string
 	OrderDate                      bigquery.NullTimestamp
 	OrderedBy                      string
 	OrderedByContactPerson         string
@@ -65,19 +80,39 @@ type SalesOrderSalesOrder struct {
 	PaymentCondition               string
 	PaymentConditionDescription    string
 	PaymentReference               string
+	Pricelist                      string
+	PricelistDescription           string
+	Project                        string
+	ProjectDescription             string
+	PurchaseOrder                  string
+	PurchaseOrderLine              string
+	PurchaseOrderLineNumber        int32
+	PurchaseOrderNumber            int32
+	Quantity                       float64
+	QuantityDelivered              float64
+	QuantityInvoiced               float64
 	Remarks                        string
-	Salesperson                    string
-	SalespersonFullName            string
+	SalesPerson                    string
+	SalesPersonFullName            string
 	SelectionCode                  string
 	SelectionCodeCode              string
 	SelectionCodeDescription       string
 	ShippingMethod                 string
 	ShippingMethodDescription      string
+	ShopOrder                      string
 	Status                         int16
 	StatusDescription              string
 	TaxSchedule                    string
 	TaxScheduleCode                string
 	TaxScheduleDescription         string
+	UnitCode                       string
+	UnitDescription                string
+	UnitPrice                      float64
+	UseDropShipment                byte
+	VATAmount                      float64
+	VATCode                        string
+	VATCodeDescription             string
+	VATPercentage                  float64
 	WarehouseCode                  string
 	WarehouseDescription           string
 	WarehouseID                    string
@@ -94,7 +129,6 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		organisationID,
 		softwareClientLicenceID,
 		timestamp,
-		c.ID.String(),
 		c.AmountDC,
 		c.AmountDiscount,
 		c.AmountDiscountExclVat,
@@ -105,10 +139,16 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		go_bigquery.DateToNullTimestamp(c.Approved),
 		c.Approver.String(),
 		c.ApproverFullName,
+		c.CostCenter,
+		c.CostCenterDescription,
+		c.CostPriceFC,
+		c.CostUnit,
+		c.CostUnitDescription,
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
+		c.CustomerItemCode,
 		c.DeliverTo.String(),
 		c.DeliverToContactPerson.String(),
 		c.DeliverToContactPersonFullName,
@@ -123,15 +163,25 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
+		c.ID.String(),
 		c.InvoiceStatus,
 		c.InvoiceStatusDescription,
 		c.InvoiceTo.String(),
 		c.InvoiceToContactPerson.String(),
 		c.InvoiceToContactPersonFullName,
 		c.InvoiceToName,
+		c.Item.String(),
+		c.ItemCode,
+		c.ItemDescription,
+		c.ItemVersion.String(),
+		c.ItemVersionDescription,
+		c.LineNumber,
+		c.Margin,
 		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
+		c.NetPrice,
+		c.Notes,
 		go_bigquery.DateToNullTimestamp(c.OrderDate),
 		c.OrderedBy.String(),
 		c.OrderedByContactPerson.String(),
@@ -142,10 +192,21 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		c.PaymentCondition,
 		c.PaymentConditionDescription,
 		c.PaymentReference,
+		c.Pricelist.String(),
+		c.PricelistDescription,
+		c.Project.String(),
+		c.ProjectDescription,
+		c.PurchaseOrder.String(),
+		c.PurchaseOrderLine.String(),
+		c.PurchaseOrderLineNumber,
+		c.PurchaseOrderNumber,
+		c.Quantity,
+		c.QuantityDelivered,
+		c.QuantityInvoiced,
 		c.Remarks,
-		//c.SalesOrderLines,
-		c.Salesperson.String(),
-		c.SalespersonFullName,
+		c.ShopOrder.String(),
+		c.SalesPerson.String(),
+		c.SalesPersonFullName,
 		c.SelectionCode.String(),
 		c.SelectionCodeCode,
 		c.SelectionCodeDescription,
@@ -156,6 +217,14 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		c.TaxSchedule.String(),
 		c.TaxScheduleCode,
 		c.TaxScheduleDescription,
+		c.UnitCode,
+		c.UnitDescription,
+		c.UnitPrice,
+		c.UseDropShipment,
+		c.VATAmount,
+		c.VATCode,
+		c.VATCodeDescription,
+		c.VATPercentage,
 		c.WarehouseCode,
 		c.WarehouseDescription,
 		c.WarehouseID.String(),

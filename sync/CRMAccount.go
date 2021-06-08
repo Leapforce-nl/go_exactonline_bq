@@ -17,7 +17,6 @@ type CRMAccount struct {
 	OrganisationID_                     int64
 	SoftwareClientLicenceID_            int64
 	Timestamp                           int64
-	ID                                  string
 	Accountant                          string
 	AccountManager                      string
 	AccountManagerFullName              string
@@ -78,6 +77,7 @@ type CRMAccount struct {
 	GLAR                                string
 	GlnNumber                           string
 	HasWithholdingTaxSales              bool
+	ID                                  string
 	IgnoreDatevWarningMessage           bool
 	IntraStatArea                       string
 	IntraStatDeliveryTerm               string
@@ -148,10 +148,10 @@ type CRMAccount struct {
 	SalesVATCodeDescription             string
 	SearchCode                          string
 	SecurityLevel                       int32
-	SeparateInvPerProject               byte
-	SeparateInvPerSubscription          byte
+	SeparateInvoicePerSubscription      byte
 	ShippingLeadDays                    int32
 	ShippingMethod                      string
+	ShowRemarkForSales                  bool
 	StartDate                           bigquery.NullTimestamp
 	State                               string
 	StateName                           string
@@ -175,7 +175,6 @@ func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicen
 		organisationID,
 		softwareClientLicenceID,
 		timestamp,
-		c.ID.String(),
 		c.Accountant.String(),
 		c.AccountManager.String(),
 		c.AccountManagerFullName,
@@ -237,6 +236,7 @@ func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicen
 		c.GLAR.String(),
 		c.GlnNumber,
 		c.HasWithholdingTaxSales,
+		c.ID.String(),
 		c.IgnoreDatevWarningMessage,
 		c.IntraStatArea,
 		c.IntraStatDeliveryTerm,
@@ -308,10 +308,10 @@ func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicen
 		c.SalesVATCodeDescription,
 		c.SearchCode,
 		c.SecurityLevel,
-		c.SeparateInvPerProject,
-		c.SeparateInvPerSubscription,
+		c.SeparateInvoicePerSubscription,
 		c.ShippingLeadDays,
 		c.ShippingMethod.String(),
+		c.ShowRemarkForSales,
 		go_bigquery.DateToNullTimestamp(c.StartDate),
 		c.State,
 		c.StateName,

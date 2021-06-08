@@ -17,7 +17,6 @@ type CRMAddress struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
 	Timestamp                int64
-	ID                       string
 	Account                  string
 	AccountIsSupplier        bool
 	AccountName              string
@@ -54,6 +53,7 @@ type CRMAddress struct {
 	FreeTextField03          string
 	FreeTextField04          string
 	FreeTextField05          string
+	ID                       string
 	Mailbox                  string
 	Main                     bool
 	Modified                 bigquery.NullTimestamp
@@ -82,7 +82,6 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 		organisationID,
 		softwareClientLicenceID,
 		timestamp,
-		c.ID.String(),
 		c.Account.String(),
 		c.AccountIsSupplier,
 		c.AccountName,
@@ -119,6 +118,7 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 		c.FreeTextField03,
 		c.FreeTextField04,
 		c.FreeTextField05,
+		c.ID.String(),
 		c.Mailbox,
 		c.Main,
 		go_bigquery.DateToNullTimestamp(c.Modified),
