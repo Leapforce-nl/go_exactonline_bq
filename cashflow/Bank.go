@@ -18,6 +18,8 @@ import (
 type Bank struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	BankName                 string
 	BICCode                  string
@@ -31,9 +33,12 @@ type Bank struct {
 }
 
 func getBank(c *cashflow.Bank, organisationID int64, softwareClientLicenceID int64) Bank {
+	t := time.Now()
+
 	return Bank{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.BankName,
 		c.BICCode,

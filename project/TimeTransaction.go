@@ -18,6 +18,8 @@ import (
 type TimeTransaction struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	Account                  string
 	AccountName              string
@@ -65,9 +67,12 @@ type TimeTransaction struct {
 }
 
 func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwareClientLicenceID int64) TimeTransaction {
+	t := time.Now()
+
 	return TimeTransaction{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountName,

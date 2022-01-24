@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type LogisticsItem struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	Timestamp                int64
 	AverageCost              float64
 	Barcode                  string
@@ -123,9 +126,12 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return LogisticsItem{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		timestamp,
 		c.AverageCost,
 		c.Barcode,

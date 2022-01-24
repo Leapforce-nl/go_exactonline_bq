@@ -18,6 +18,8 @@ import (
 type PlannedSalesReturn struct {
 	OrganisationID_                  int64
 	SoftwareClientLicenceID_         int64
+	Created_                         time.Time
+	Modified_                        time.Time
 	PlannedSalesReturnID             string
 	Created                          bigquery.NullTimestamp
 	Creator                          string
@@ -46,9 +48,12 @@ type PlannedSalesReturn struct {
 }
 
 func getPlannedSalesReturn(c *salesorder.PlannedSalesReturn, organisationID int64, softwareClientLicenceID int64) PlannedSalesReturn {
+	t := time.Now()
+
 	return PlannedSalesReturn{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.PlannedSalesReturnID.String(),
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),

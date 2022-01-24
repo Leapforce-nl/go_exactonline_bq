@@ -16,6 +16,8 @@ import (
 type OutstandingInvoicesOverview struct {
 	OrganisationID_                    int64
 	SoftwareClientLicenceID_           int64
+	Created_                           time.Time
+	Modified_                          time.Time
 	CurrencyCode                       string
 	OutstandingPayableInvoiceAmount    float64
 	OutstandingPayableInvoiceCount     float64
@@ -28,9 +30,12 @@ type OutstandingInvoicesOverview struct {
 }
 
 func getOutstandingInvoicesOverview(c *financial.OutstandingInvoicesOverview, organisationID int64, softwareClientLicenceID int64) OutstandingInvoicesOverview {
+	t := time.Now()
+
 	return OutstandingInvoicesOverview{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.CurrencyCode,
 		c.OutstandingPayableInvoiceAmount,
 		c.OutstandingPayableInvoiceCount,

@@ -18,6 +18,8 @@ import (
 type Receivable struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	Created_                      time.Time
+	Modified_                     time.Time
 	ID                            string
 	Account                       string
 	AccountBankAccountID          string
@@ -99,9 +101,12 @@ type Receivable struct {
 }
 
 func getReceivable(c *cashflow.Receivable, organisationID int64, softwareClientLicenceID int64) Receivable {
+	t := time.Now()
+
 	return Receivable{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountBankAccountID.String(),

@@ -16,6 +16,8 @@ import (
 type ReportingBalanceByClassification struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	ID                        string
 	Amount                    float64
 	AmountCredit              float64
@@ -40,9 +42,12 @@ type ReportingBalanceByClassification struct {
 }
 
 func getReportingBalanceByClassification(c *financial.ReportingBalanceByClassification, organisationID int64, softwareClientLicenceID int64) ReportingBalanceByClassification {
+	t := time.Now()
+
 	return ReportingBalanceByClassification{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID,
 		c.Amount,
 		c.AmountCredit,

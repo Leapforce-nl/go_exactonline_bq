@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type CRMContact struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	Timestamp                 int64
 	Account                   string
 	AccountIsCustomer         bool
@@ -91,9 +94,12 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return CRMContact{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		timestamp,
 		c.Account.String(),
 		c.AccountIsCustomer,

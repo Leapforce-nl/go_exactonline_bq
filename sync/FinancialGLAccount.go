@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type FinancialGLAccount struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
+	Created_                       time.Time
+	Modified_                      time.Time
 	Timestamp                      int64
 	AssimilatedVATBox              int16
 	BalanceSide                    string
@@ -65,9 +68,12 @@ func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, sof
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return FinancialGLAccount{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.Timestamp.Value(),
 		c.AssimilatedVATBox,
 		c.BalanceSide,

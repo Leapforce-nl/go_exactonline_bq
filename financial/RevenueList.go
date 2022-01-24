@@ -16,15 +16,20 @@ import (
 type RevenueList struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	Period                   int32
 	Year                     int32
 	Amount                   float64
 }
 
 func getRevenueList(c *financial.RevenueList, organisationID int64, softwareClientLicenceID int64) RevenueList {
+	t := time.Now()
+
 	return RevenueList{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.Period,
 		c.Year,
 		c.Amount,

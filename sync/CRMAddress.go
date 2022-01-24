@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type CRMAddress struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	Timestamp                int64
 	Account                  string
 	AccountIsSupplier        bool
@@ -78,9 +81,12 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return CRMAddress{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		timestamp,
 		c.Account.String(),
 		c.AccountIsSupplier,

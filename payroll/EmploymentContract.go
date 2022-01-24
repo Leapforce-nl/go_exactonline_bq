@@ -18,6 +18,8 @@ import (
 type EmploymentContract struct {
 	OrganisationID_              int64
 	SoftwareClientLicenceID_     int64
+	Created_                     time.Time
+	Modified_                    time.Time
 	ID                           string
 	ContractFlexPhase            int32
 	ContractFlexPhaseDescription string
@@ -49,9 +51,13 @@ type EmploymentContract struct {
 }
 
 func getEmploymentContract(c *payroll.EmploymentContract, organisationID int64, softwareClientLicenceID int64) EmploymentContract {
+	t := time.Now()
+
 	return EmploymentContract{
 		organisationID,
 		softwareClientLicenceID,
+		t,
+		t,
 		c.ID.String(),
 		c.ContractFlexPhase,
 		c.ContractFlexPhaseDescription,

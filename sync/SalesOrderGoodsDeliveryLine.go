@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type SalesOrderGoodsDeliveryLine struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	Timestamp                int64
 	ID                       string
 	//BatchNumbers
@@ -53,9 +56,12 @@ func getSalesOrderGoodsDeliveryLine(c *sync.SalesOrderGoodsDeliveryLine, organis
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return SalesOrderGoodsDeliveryLine{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		timestamp,
 		c.ID.String(),
 		//c.BatchNumbers,

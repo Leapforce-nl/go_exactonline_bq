@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type SalesOrderSalesOrder struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
+	Created_                       time.Time
+	Modified_                      time.Time
 	Timestamp                      int64
 	AmountDC                       float64
 	AmountDiscount                 float64
@@ -125,9 +128,12 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return SalesOrderSalesOrder{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		timestamp,
 		c.AmountDC,
 		c.AmountDiscount,

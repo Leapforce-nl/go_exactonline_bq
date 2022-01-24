@@ -16,6 +16,8 @@ import (
 type AgingReceivablesListByAgeGroup struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	AgeGroup                 int
 	AccountID                string
 	AccountCode              string
@@ -37,9 +39,12 @@ type AgingReceivablesListByAgeGroup struct {
 }
 
 func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64) AgingReceivablesListByAgeGroup {
+	t := time.Now()
+
 	return AgingReceivablesListByAgeGroup{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		ageGroup,
 		c.AccountID.String(),
 		c.AccountCode,

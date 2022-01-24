@@ -18,6 +18,8 @@ import (
 type PayablesListByAgeGroup struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	AgeGroup                 int
 	HID                      string
 	AccountCode              string
@@ -39,9 +41,12 @@ type PayablesListByAgeGroup struct {
 }
 
 func getPayablesListByAgeGroup(c *financial.PayablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64) PayablesListByAgeGroup {
+	t := time.Now()
+
 	return PayablesListByAgeGroup{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		ageGroup,
 		c.HID,
 		c.AccountCode,

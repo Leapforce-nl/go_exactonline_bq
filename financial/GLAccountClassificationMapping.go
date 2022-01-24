@@ -16,6 +16,8 @@ import (
 type GLAccountClassificationMapping struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	ID                        string
 	Classification            string
 	ClassificationCode        string
@@ -30,9 +32,12 @@ type GLAccountClassificationMapping struct {
 }
 
 func getGLAccountClassificationMapping(c *financial.GLAccountClassificationMapping, organisationID int64, softwareClientLicenceID int64) GLAccountClassificationMapping {
+	t := time.Now()
+
 	return GLAccountClassificationMapping{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Classification.String(),
 		c.ClassificationCode,

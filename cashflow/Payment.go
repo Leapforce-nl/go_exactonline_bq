@@ -18,6 +18,8 @@ import (
 type Payment struct {
 	OrganisationID_              int64
 	SoftwareClientLicenceID_     int64
+	Created_                     time.Time
+	Modified_                    time.Time
 	ID                           string
 	Account                      string
 	AccountBankAccountID         string
@@ -89,9 +91,12 @@ type Payment struct {
 }
 
 func getPayment(c *cashflow.Payment, organisationID int64, softwareClientLicenceID int64) Payment {
+	t := time.Now()
+
 	return Payment{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountBankAccountID.String(),

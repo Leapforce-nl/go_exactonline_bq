@@ -17,6 +17,8 @@ import (
 type PurchaseOrder struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	Created_                      time.Time
+	Modified_                     time.Time
 	PurchaseOrderID               string
 	AmountDC                      float64
 	AmountFC                      float64
@@ -71,9 +73,12 @@ type PurchaseOrder struct {
 }
 
 func getPurchaseOrder(c *purchaseorder.PurchaseOrder, organisationID int64, softwareClientLicenceID int64) PurchaseOrder {
+	t := time.Now()
+
 	return PurchaseOrder{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.PurchaseOrderID.String(),
 		c.AmountDC,
 		c.AmountFC,

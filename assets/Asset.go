@@ -18,6 +18,8 @@ import (
 type Asset struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	Created_                      time.Time
+	Modified_                     time.Time
 	ID                            string
 	AlreadyDepreciated            byte
 	AssetFrom                     string
@@ -74,9 +76,12 @@ type Asset struct {
 }
 
 func getAsset(c *assets.Asset, organisationID int64, softwareClientLicenceID int64) Asset {
+	t := time.Now()
+
 	return Asset{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.AlreadyDepreciated,
 		c.AssetFrom.String(),

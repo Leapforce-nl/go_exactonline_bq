@@ -18,6 +18,8 @@ import (
 type GLScheme struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	Code                     string
 	Created                  bigquery.NullTimestamp
@@ -33,9 +35,12 @@ type GLScheme struct {
 }
 
 func getGLScheme(c *financial.GLScheme, organisationID int64, softwareClientLicenceID int64) GLScheme {
+	t := time.Now()
+
 	return GLScheme{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Code,
 		go_bigquery.DateToNullTimestamp(c.Created),

@@ -16,6 +16,8 @@ import (
 type ItemAssortmentProperty struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	Code                     string
 	Description              string
@@ -24,9 +26,12 @@ type ItemAssortmentProperty struct {
 }
 
 func getItemAssortmentProperty(c *logistics.ItemAssortmentProperty, organisationID int64, softwareClientLicenceID int64) ItemAssortmentProperty {
+	t := time.Now()
+
 	return ItemAssortmentProperty{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Code,
 		c.Description,

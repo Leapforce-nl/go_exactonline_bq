@@ -9,8 +9,8 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
-	bigquerytools "github.com/Leapforce-nl/go_bigquerytools"
-	financialtransaction "github.com/Leapforce-nl/go_exactonline_new/financialtransaction"
+	go_bigquery "github.com/leapforce-libraries/go_google/bigquery"
+	financialtransaction "github.com/leapforce-libraries/go_exactonline_new/financialtransaction"
 )
 
 type TransactionLineBQ struct {
@@ -103,17 +103,17 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.CostCenterDescription,
 		c.CostUnit,
 		c.CostUnitDescription,
-		bigquerytools.DateToNullTimestamp(c.Created),
+		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
-		bigquerytools.DateToNullTimestamp(c.Date),
+		go_bigquery.DateToNullTimestamp(c.Date),
 		c.Description,
 		c.Division,
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
-		bigquerytools.DateToNullTimestamp(c.DueDate),
+		go_bigquery.DateToNullTimestamp(c.DueDate),
 		c.EntryID.String(),
 		c.EntryNumber,
 		c.ExchangeRate,
@@ -132,7 +132,7 @@ func getTransactionLineBQ(c *financialtransaction.TransactionLine, clientID stri
 		c.JournalDescription,
 		c.LineNumber,
 		c.LineType,
-		bigquerytools.DateToNullTimestamp(c.Modified),
+		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
 		c.Notes,

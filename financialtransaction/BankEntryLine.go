@@ -18,6 +18,8 @@ import (
 type BankEntryLine struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	Account                  string
 	AccountCode              string
@@ -65,9 +67,12 @@ type BankEntryLine struct {
 }
 
 func getBankEntryLine(c *financialtransaction.BankEntryLine, organisationID int64, softwareClientLicenceID int64) BankEntryLine {
+	t := time.Now()
+
 	return BankEntryLine{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountCode,

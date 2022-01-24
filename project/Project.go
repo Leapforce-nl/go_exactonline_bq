@@ -18,6 +18,8 @@ import (
 type Project struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	ID                        string
 	Account                   string
 	AccountCode               string
@@ -70,9 +72,12 @@ type Project struct {
 }
 
 func getProject(c *project.Project, organisationID int64, softwareClientLicenceID int64) Project {
+	t := time.Now()
+
 	return Project{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Account.String(),
 		c.AccountCode,

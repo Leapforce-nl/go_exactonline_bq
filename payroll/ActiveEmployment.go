@@ -18,6 +18,8 @@ import (
 type ActiveEmployment struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	AverageDaysPerWeek       float64
 	AverageHoursPerWeek      float64
@@ -65,9 +67,12 @@ type ActiveEmployment struct {
 }
 
 func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, softwareClientLicenceID int64) ActiveEmployment {
+	t := time.Now()
+
 	return ActiveEmployment{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.AverageDaysPerWeek,
 		c.AverageHoursPerWeek,

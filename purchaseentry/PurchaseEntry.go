@@ -17,6 +17,8 @@ import (
 type PurchaseEntry struct {
 	OrganisationID_             int64
 	SoftwareClientLicenceID_    int64
+	Created_                    time.Time
+	Modified_                   time.Time
 	EntryID                     string
 	AmountDC                    float64
 	AmountFC                    float64
@@ -63,9 +65,12 @@ type PurchaseEntry struct {
 }
 
 func getPurchaseEntry(c *purchaseentry.PurchaseEntry, organisationID int64, softwareClientLicenceID int64) PurchaseEntry {
+	t := time.Now()
+
 	return PurchaseEntry{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.EntryID.String(),
 		c.AmountDC,
 		c.AmountFC,

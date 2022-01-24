@@ -18,6 +18,8 @@ import (
 type ProjectHourBudget struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	Budget                   float64
 	Created                  bigquery.NullTimestamp
@@ -36,9 +38,12 @@ type ProjectHourBudget struct {
 }
 
 func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, softwareClientLicenceID int64) ProjectHourBudget {
+	t := time.Now()
+
 	return ProjectHourBudget{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		p.ID.String(),
 		p.Budget,
 		go_bigquery.DateToNullTimestamp(p.Created),

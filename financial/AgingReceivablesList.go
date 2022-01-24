@@ -16,6 +16,8 @@ import (
 type AgingReceivablesList struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	AccountID                string
 	AccountCode              string
 	AccountName              string
@@ -36,9 +38,12 @@ type AgingReceivablesList struct {
 }
 
 func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID int64, softwareClientLicenceID int64) AgingReceivablesList {
+	t := time.Now()
+
 	return AgingReceivablesList{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.AccountID.String(),
 		c.AccountCode,
 		c.AccountName,

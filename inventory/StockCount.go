@@ -18,6 +18,8 @@ import (
 type StockCount struct {
 	OrganisationID_              int64
 	SoftwareClientLicenceID_     int64
+	Created_                     time.Time
+	Modified_                    time.Time
 	StockCountID                 string
 	Created                      bigquery.NullTimestamp
 	Creator                      string
@@ -41,9 +43,12 @@ type StockCount struct {
 }
 
 func getStockCount(c *inventory.StockCount, organisationID int64, softwareClientLicenceID int64) StockCount {
+	t := time.Now()
+
 	return StockCount{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.StockCountID.String(),
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),

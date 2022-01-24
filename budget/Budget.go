@@ -18,6 +18,8 @@ import (
 type Budget struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	ID                        string
 	AmountDC                  float64
 	BudgetScenario            string
@@ -46,9 +48,12 @@ type Budget struct {
 }
 
 func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID int64) Budget {
+	t := time.Now()
+
 	return Budget{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.AmountDC,
 		c.BudgetScenario.String(),

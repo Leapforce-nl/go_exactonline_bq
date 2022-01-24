@@ -18,6 +18,8 @@ import (
 type StockCountLine struct {
 	OrganisationID_            int64
 	SoftwareClientLicenceID_   int64
+	Created_                   time.Time
+	Modified_                  time.Time
 	ID                         string
 	CostPrice                  float64
 	Created                    bigquery.NullTimestamp
@@ -44,9 +46,12 @@ type StockCountLine struct {
 }
 
 func getStockCountLine(c *inventory.StockCountLine, organisationID int64, softwareClientLicenceID int64) StockCountLine {
+	t := time.Now()
+
 	return StockCountLine{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		//c.BatchNumbers,
 		c.CostPrice,

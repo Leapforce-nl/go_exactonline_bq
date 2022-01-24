@@ -18,6 +18,8 @@ import (
 type PlannedSalesReturnLine struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
+	Created_                 time.Time
+	Modified_                time.Time
 	ID                       string
 	//BatchNumbers
 	CreateCredit          byte
@@ -49,9 +51,12 @@ type PlannedSalesReturnLine struct {
 }
 
 func getPlannedSalesReturnLine(c *salesorder.PlannedSalesReturnLine, organisationID int64, softwareClientLicenceID int64) PlannedSalesReturnLine {
+	t := time.Now()
+
 	return PlannedSalesReturnLine{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		//c.BatchNumbers,
 		c.CreateCredit,

@@ -18,6 +18,8 @@ import (
 type ItemGroup struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
+	Created_                       time.Time
+	Modified_                      time.Time
 	ID                             string
 	Code                           string
 	Created                        bigquery.NullTimestamp
@@ -51,9 +53,12 @@ type ItemGroup struct {
 }
 
 func getItemGroup(c *logistics.ItemGroup, organisationID int64, softwareClientLicenceID int64) ItemGroup {
+	t := time.Now()
+
 	return ItemGroup{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.ID.String(),
 		c.Code,
 		go_bigquery.DateToNullTimestamp(c.Created),

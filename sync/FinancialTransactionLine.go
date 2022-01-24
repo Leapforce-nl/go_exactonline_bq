@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
@@ -16,6 +17,8 @@ import (
 type FinancialTransactionLine struct {
 	OrganisationID_           int64
 	SoftwareClientLicenceID_  int64
+	Created_                  time.Time
+	Modified_                 time.Time
 	Timestamp                 int64
 	ID                        string
 	Account                   string
@@ -93,9 +96,12 @@ func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationI
 		*maxTimestamp = timestamp
 	}
 
+	t := time.Now()
+
 	return FinancialTransactionLine{
 		organisationID,
 		softwareClientLicenceID,
+		t, t,
 		c.Timestamp.Value(),
 		c.ID.String(),
 		c.Account.String(),
