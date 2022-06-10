@@ -145,7 +145,7 @@ func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, o
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#ReceivablesLists: %v\n", rowCount)
+	fmt.Printf("#PayablesLists: %v\n", rowCount)
 
 	return objectHandles, rowCount, PayablesList{}, nil
 }
