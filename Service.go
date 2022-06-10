@@ -18,7 +18,6 @@ import (
 	salesorder "github.com/leapforce-libraries/go_exactonline_bq/salesorder"
 	sync "github.com/leapforce-libraries/go_exactonline_bq/sync"
 	exactonline "github.com/leapforce-libraries/go_exactonline_new"
-	bigquery "github.com/leapforce-libraries/go_google/bigquery"
 )
 
 type Service struct {
@@ -39,7 +38,7 @@ type Service struct {
 	SyncService                 *sync.Service
 }
 
-func NewService(exactonlineService *exactonline.Service, bigQueryService *bigquery.Service) (*Service, *errortools.Error) {
+func NewService(exactonlineService *exactonline.Service) (*Service, *errortools.Error) {
 	if exactonlineService == nil {
 		return nil, nil
 	}
