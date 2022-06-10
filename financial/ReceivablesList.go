@@ -20,7 +20,7 @@ type ReceivablesList struct {
 	SoftwareClientLicenceID_ int64
 	Created_                 time.Time
 	Modified_                time.Time
-	HID                      int64
+	HID                      string
 	AccountCode              string
 	AccountId                string
 	AccountName              string

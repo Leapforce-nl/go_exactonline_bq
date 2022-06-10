@@ -20,7 +20,7 @@ type PayablesList struct {
 	SoftwareClientLicenceID_ int64
 	Created_                 time.Time
 	Modified_                time.Time
-	HID                      int64
+	HID                      string
 	AccountCode              string
 	AccountId                string
 	AccountName              string
@@ -39,7 +39,7 @@ type PayablesList struct {
 	YourRef                  string
 }
 
-func getPayablesList(c *financial.PayablesList, ageGroup int, organisationID int64, softwareClientLicenceID int64) PayablesList {
+func getPayablesList(c *financial.PayablesList, organisationID int64, softwareClientLicenceID int64) PayablesList {
 	t := time.Now()
 
 	return PayablesList{
@@ -73,88 +73,79 @@ func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, o
 
 	objectHandles := []*storage.ObjectHandle{}
 
-	ageGroup := 1
-	rowCountTotal := 0
+	var w *storage.Writer
 
-	for ageGroup <= 4 {
-		var w *storage.Writer
+	call := service.FinancialService().NewGetPayablesListsCall()
 
-		call := service.FinancialService().NewGetPayablesListsCall()
+	rowCount := 0
+	batchRowCount := 0
+	batchSize := 10000
 
-		rowCount := 0
-		batchRowCount := 0
-		batchSize := 10000
+	for {
+		payablesLists, e := call.Do()
+		if e != nil {
+			return nil, 0, nil, e
+		}
 
-		for {
-			payablesLists, e := call.Do()
-			if e != nil {
-				return nil, 0, nil, e
+		if payablesLists == nil {
+			break
+		}
+
+		if batchRowCount == 0 {
+			guid := types.NewGuid()
+			objectHandle := bucketHandle.Object((&guid).String())
+			objectHandles = append(objectHandles, objectHandle)
+
+			w = objectHandle.NewWriter(context.Background())
+		}
+
+		for _, tl := range *payablesLists {
+			batchRowCount++
+
+			b, err := json.Marshal(getPayablesList(&tl, organisationID, softwareClientLicenceID))
+			if err != nil {
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 
-			if payablesLists == nil {
-				break
+			// Write data
+			_, err = w.Write(b)
+			if err != nil {
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 
-			if batchRowCount == 0 {
-				guid := types.NewGuid()
-				objectHandle := bucketHandle.Object((&guid).String())
-				objectHandles = append(objectHandles, objectHandle)
-
-				w = objectHandle.NewWriter(context.Background())
-			}
-
-			for _, tl := range *payablesLists {
-				batchRowCount++
-
-				b, err := json.Marshal(getPayablesList(&tl, ageGroup, organisationID, softwareClientLicenceID))
-				if err != nil {
-					return nil, 0, nil, errortools.ErrorMessage(err)
-				}
-
-				// Write data
-				_, err = w.Write(b)
-				if err != nil {
-					return nil, 0, nil, errortools.ErrorMessage(err)
-				}
-
-				// Write NewLine
-				_, err = fmt.Fprintf(w, "\n")
-				if err != nil {
-					return nil, 0, nil, errortools.ErrorMessage(err)
-				}
-			}
-
-			if batchRowCount > batchSize {
-				// Close and flush data
-				err := w.Close()
-				if err != nil {
-					return nil, 0, nil, errortools.ErrorMessage(err)
-				}
-				w = nil
-
-				fmt.Printf("#PayablesLists flushed: %v\n", batchRowCount)
-
-				rowCount += batchRowCount
-				batchRowCount = 0
+			// Write NewLine
+			_, err = fmt.Fprintf(w, "\n")
+			if err != nil {
+				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
 		}
 
-		if w != nil {
+		if batchRowCount > batchSize {
 			// Close and flush data
 			err := w.Close()
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
+			w = nil
+
+			fmt.Printf("#PayablesLists flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
+			batchRowCount = 0
 		}
-
-		fmt.Printf("#PayablesLists, ageGroup %v: %v\n", ageGroup, rowCount)
-
-		rowCountTotal += rowCount
-
-		ageGroup++
 	}
 
-	return objectHandles, rowCountTotal, PayablesList{}, nil
+	if w != nil {
+		// Close and flush data
+		err := w.Close()
+		if err != nil {
+			return nil, 0, nil, errortools.ErrorMessage(err)
+		}
+
+		rowCount += batchRowCount
+	}
+
+	fmt.Printf("#ReceivablesLists: %v\n", rowCount)
+
+	return objectHandles, rowCount, PayablesList{}, nil
 }
