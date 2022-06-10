@@ -153,7 +153,7 @@ func (service *Service) writeReportingBalanceByClassifications(bucketHandle *sto
 	batchRowCount := 0
 	batchSize := 10000
 
-	for true {
+	for {
 		reportingBalanceByClassifications, e := call.Do()
 		if e != nil {
 			return nil, 0, e
@@ -164,7 +164,7 @@ func (service *Service) writeReportingBalanceByClassifications(bucketHandle *sto
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

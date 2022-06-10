@@ -96,7 +96,7 @@ func (service *Service) WriteFinancialGLClassifications(bucketHandle *storage.Bu
 
 	maxTimestamp := int64(0)
 
-	for true {
+	for {
 		transactionLines, e := call.Do()
 		if e != nil {
 			return nil, nil, e
@@ -107,7 +107,7 @@ func (service *Service) WriteFinancialGLClassifications(bucketHandle *storage.Bu
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

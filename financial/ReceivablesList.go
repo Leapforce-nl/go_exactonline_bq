@@ -6,65 +6,65 @@ import (
 	"fmt"
 	"time"
 
+	bigquery "cloud.google.com/go/bigquery"
 	"cloud.google.com/go/storage"
 
 	errortools "github.com/leapforce-libraries/go_errortools"
 	financial "github.com/leapforce-libraries/go_exactonline_new/financial"
+	go_bigquery "github.com/leapforce-libraries/go_google/bigquery"
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type AgingReceivablesList struct {
+type ReceivablesList struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
 	Created_                 time.Time
 	Modified_                time.Time
-	AccountID                string
+	HID                      int64
 	AccountCode              string
+	AccountId                string
 	AccountName              string
-	AgeGroup1                int32
-	AgeGroup1Amount          float64
-	AgeGroup1Description     string
-	AgeGroup2                int32
-	AgeGroup2Amount          float64
-	AgeGroup2Description     string
-	AgeGroup3                int32
-	AgeGroup3Amount          float64
-	AgeGroup3Description     string
-	AgeGroup4                int32
-	AgeGroup4Amount          float64
-	AgeGroup4Description     string
+	Amount                   float64
+	AmountInTransit          float64
 	CurrencyCode             string
-	TotalAmount              float64
+	Description              string
+	DueDate                  bigquery.NullTimestamp
+	EntryNumber              int32
+	Id                       string
+	InvoiceDate              bigquery.NullTimestamp
+	InvoiceNumber            int32
+	JournalCode              string
+	JournalDescription       string
+	YourRef                  string
 }
 
-func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID int64, softwareClientLicenceID int64) AgingReceivablesList {
+func getReceivablesList(c *financial.ReceivablesList, organisationID int64, softwareClientLicenceID int64) ReceivablesList {
 	t := time.Now()
 
-	return AgingReceivablesList{
+	return ReceivablesList{
 		organisationID,
 		softwareClientLicenceID,
 		t, t,
-		c.AccountID.String(),
+		c.HID,
 		c.AccountCode,
+		c.AccountId.String(),
 		c.AccountName,
-		c.AgeGroup1,
-		c.AgeGroup1Amount,
-		c.AgeGroup1Description,
-		c.AgeGroup2,
-		c.AgeGroup2Amount,
-		c.AgeGroup2Description,
-		c.AgeGroup3,
-		c.AgeGroup3Amount,
-		c.AgeGroup3Description,
-		c.AgeGroup4,
-		c.AgeGroup4Amount,
-		c.AgeGroup4Description,
+		c.Amount,
+		c.AmountInTransit,
 		c.CurrencyCode,
-		c.TotalAmount,
+		c.Description,
+		go_bigquery.DateToNullTimestamp(c.DueDate),
+		c.EntryNumber,
+		c.Id.String(),
+		go_bigquery.DateToNullTimestamp(c.InvoiceDate),
+		c.InvoiceNumber,
+		c.JournalCode,
+		c.JournalDescription,
+		c.YourRef,
 	}
 }
 
-func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -72,19 +72,19 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := service.FinancialService().NewGetAgingReceivablesListsCall()
+	call := service.FinancialService().NewGetReceivablesListsCall()
 
 	rowCount := 0
 	batchRowCount := 0
 	batchSize := 10000
 
 	for {
-		agingReceivablesLists, e := call.Do()
+		receivablesLists, e := call.Do()
 		if e != nil {
 			return nil, 0, nil, e
 		}
 
-		if agingReceivablesLists == nil {
+		if receivablesLists == nil {
 			break
 		}
 
@@ -96,10 +96,10 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 			w = objectHandle.NewWriter(context.Background())
 		}
 
-		for _, tl := range *agingReceivablesLists {
+		for _, tl := range *receivablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getAgingReceivablesList(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getReceivablesList(&tl, organisationID, softwareClientLicenceID))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
@@ -125,7 +125,7 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 			}
 			w = nil
 
-			fmt.Printf("#AgingReceivablesLists flushed: %v\n", batchRowCount)
+			fmt.Printf("#ReceivablesLists flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -142,7 +142,7 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#AgingReceivablesLists: %v\n", rowCount)
+	fmt.Printf("#ReceivablesLists: %v\n", rowCount)
 
-	return objectHandles, rowCount, AgingReceivablesList{}, nil
+	return objectHandles, rowCount, ReceivablesList{}, nil
 }

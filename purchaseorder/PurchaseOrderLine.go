@@ -157,7 +157,7 @@ func (service *Service) WritePurchaseOrderLines(bucketHandle *storage.BucketHand
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

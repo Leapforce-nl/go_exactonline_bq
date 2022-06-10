@@ -15,13 +15,12 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type PayablesListByAgeGroup struct {
+type PayablesList struct {
 	OrganisationID_          int64
 	SoftwareClientLicenceID_ int64
 	Created_                 time.Time
 	Modified_                time.Time
-	AgeGroup                 int
-	HID                      string
+	HID                      int64
 	AccountCode              string
 	AccountId                string
 	AccountName              string
@@ -40,17 +39,16 @@ type PayablesListByAgeGroup struct {
 	YourRef                  string
 }
 
-func getPayablesListByAgeGroup(c *financial.PayablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64) PayablesListByAgeGroup {
+func getPayablesList(c *financial.PayablesList, ageGroup int, organisationID int64, softwareClientLicenceID int64) PayablesList {
 	t := time.Now()
 
-	return PayablesListByAgeGroup{
+	return PayablesList{
 		organisationID,
 		softwareClientLicenceID,
 		t, t,
-		ageGroup,
 		c.HID,
 		c.AccountCode,
-		c.AccountID.String(),
+		c.AccountId.String(),
 		c.AccountName,
 		c.Amount,
 		c.AmountInTransit,
@@ -59,7 +57,7 @@ func getPayablesListByAgeGroup(c *financial.PayablesListByAgeGroup, ageGroup int
 		c.Description,
 		go_bigquery.DateToNullTimestamp(c.DueDate),
 		c.EntryNumber,
-		c.ID.String(),
+		c.Id.String(),
 		go_bigquery.DateToNullTimestamp(c.InvoiceDate),
 		c.InvoiceNumber,
 		c.JournalCode,
@@ -68,7 +66,7 @@ func getPayablesListByAgeGroup(c *financial.PayablesListByAgeGroup, ageGroup int
 	}
 }
 
-func (service *Service) WritePayablesListByAgeGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -81,19 +79,19 @@ func (service *Service) WritePayablesListByAgeGroups(bucketHandle *storage.Bucke
 	for ageGroup <= 4 {
 		var w *storage.Writer
 
-		call := service.FinancialService().NewGetPayablesListByAgeGroupsCall()
+		call := service.FinancialService().NewGetPayablesListsCall()
 
 		rowCount := 0
 		batchRowCount := 0
 		batchSize := 10000
 
 		for {
-			payablesListByAgeGroups, e := call.Do()
+			payablesLists, e := call.Do()
 			if e != nil {
 				return nil, 0, nil, e
 			}
 
-			if payablesListByAgeGroups == nil {
+			if payablesLists == nil {
 				break
 			}
 
@@ -105,10 +103,10 @@ func (service *Service) WritePayablesListByAgeGroups(bucketHandle *storage.Bucke
 				w = objectHandle.NewWriter(context.Background())
 			}
 
-			for _, tl := range *payablesListByAgeGroups {
+			for _, tl := range *payablesLists {
 				batchRowCount++
 
-				b, err := json.Marshal(getPayablesListByAgeGroup(&tl, ageGroup, organisationID, softwareClientLicenceID))
+				b, err := json.Marshal(getPayablesList(&tl, ageGroup, organisationID, softwareClientLicenceID))
 				if err != nil {
 					return nil, 0, nil, errortools.ErrorMessage(err)
 				}
@@ -134,7 +132,7 @@ func (service *Service) WritePayablesListByAgeGroups(bucketHandle *storage.Bucke
 				}
 				w = nil
 
-				fmt.Printf("#PayablesListByAgeGroups flushed: %v\n", batchRowCount)
+				fmt.Printf("#PayablesLists flushed: %v\n", batchRowCount)
 
 				rowCount += batchRowCount
 				batchRowCount = 0
@@ -151,12 +149,12 @@ func (service *Service) WritePayablesListByAgeGroups(bucketHandle *storage.Bucke
 			rowCount += batchRowCount
 		}
 
-		fmt.Printf("#PayablesListByAgeGroups, ageGroup %v: %v\n", ageGroup, rowCount)
+		fmt.Printf("#PayablesLists, ageGroup %v: %v\n", ageGroup, rowCount)
 
 		rowCountTotal += rowCount
 
 		ageGroup++
 	}
 
-	return objectHandles, rowCountTotal, PayablesListByAgeGroup{}, nil
+	return objectHandles, rowCountTotal, PayablesList{}, nil
 }

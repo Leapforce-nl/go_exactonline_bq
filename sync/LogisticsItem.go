@@ -250,7 +250,7 @@ func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, 
 
 	maxTimestamp := int64(0)
 
-	for true {
+	for {
 		transactionLines, e := call.Do()
 		if e != nil {
 			return nil, nil, e
@@ -261,7 +261,7 @@ func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, 
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

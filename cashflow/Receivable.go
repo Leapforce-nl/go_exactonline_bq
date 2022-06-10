@@ -213,7 +213,7 @@ func (service *Service) WriteReceivablesBQ(bucketHandle *storage.BucketHandle, o
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

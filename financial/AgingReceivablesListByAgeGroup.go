@@ -85,7 +85,7 @@ func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *stora
 		batchRowCount := 0
 		batchSize := 10000
 
-		for true {
+		for {
 			agingReceivablesListByAgeGroups, e := call.Do()
 			if e != nil {
 				return nil, 0, nil, e
@@ -96,7 +96,7 @@ func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *stora
 			}
 
 			if batchRowCount == 0 {
-				guid := types.NewGUID()
+				guid := types.NewGuid()
 				objectHandle := bucketHandle.Object((&guid).String())
 				objectHandles = append(objectHandles, objectHandle)
 

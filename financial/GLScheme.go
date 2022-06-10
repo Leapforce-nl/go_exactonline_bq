@@ -70,7 +70,7 @@ func (service *Service) WriteGLSchemes(bucketHandle *storage.BucketHandle, organ
 	batchRowCount := 0
 	batchSize := 10000
 
-	for true {
+	for {
 		glSchemes, e := call.Do()
 		if e != nil {
 			return nil, 0, nil, e
@@ -81,7 +81,7 @@ func (service *Service) WriteGLSchemes(bucketHandle *storage.BucketHandle, organ
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

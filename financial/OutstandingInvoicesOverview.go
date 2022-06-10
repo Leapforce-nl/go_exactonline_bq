@@ -62,7 +62,7 @@ func (service *Service) WriteOutstandingInvoicesOverviews(bucketHandle *storage.
 	batchRowCount := 0
 	batchSize := 10000
 
-	for true {
+	for {
 		outstandingInvoicesOverviews, e := call.Do()
 		if e != nil {
 			return nil, 0, nil, e
@@ -73,7 +73,7 @@ func (service *Service) WriteOutstandingInvoicesOverviews(bucketHandle *storage.
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

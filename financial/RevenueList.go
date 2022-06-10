@@ -50,7 +50,7 @@ func (service *Service) WriteRevenueLists(bucketHandle *storage.BucketHandle, or
 	batchRowCount := 0
 	batchSize := 10000
 
-	for true {
+	for {
 		revenueLists, e := call.Do()
 		if e != nil {
 			return nil, 0, nil, e
@@ -61,7 +61,7 @@ func (service *Service) WriteRevenueLists(bucketHandle *storage.BucketHandle, or
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 

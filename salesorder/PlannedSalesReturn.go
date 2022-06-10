@@ -107,7 +107,7 @@ func (service *Service) WritePlannedSalesReturns(bucketHandle *storage.BucketHan
 		}
 
 		if batchRowCount == 0 {
-			guid := types.NewGUID()
+			guid := types.NewGuid()
 			objectHandle := bucketHandle.Object((&guid).String())
 			objectHandles = append(objectHandles, objectHandle)
 
