@@ -16,62 +16,64 @@ import (
 )
 
 type BankEntryLine struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Account                  string
-	AccountCode              string
-	AccountName              string
-	AmountDC                 float64
-	AmountFC                 float64
-	AmountVATFC              float64
-	Asset                    string
-	AssetCode                string
-	AssetDescription         string
-	CostCenter               string
-	CostCenterDescription    string
-	CostUnit                 string
-	CostUnitDescription      string
-	Created                  _bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Date                     _bigquery.NullTimestamp
-	Description              string
-	Division                 int32
-	Document                 string
-	DocumentNumber           int32
-	DocumentSubject          string
-	EntryID                  string
-	EntryNumber              int32
-	ExchangeRate             float64
-	GLAccount                string
-	GLAccountCode            string
-	GLAccountDescription     string
-	LineNumber               int32
-	Modified                 _bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	Notes                    string
-	OffsetID                 string
-	OurRef                   int32
-	Project                  string
-	ProjectCode              string
-	ProjectDescription       string
-	Quantity                 float64
-	VATCode                  string
-	VATCodeDescription       string
-	VATPercentage            float64
-	VATType                  string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Account                    string
+	AccountCode                string
+	AccountName                string
+	AmountDC                   float64
+	AmountFC                   float64
+	AmountVATFC                float64
+	Asset                      string
+	AssetCode                  string
+	AssetDescription           string
+	CostCenter                 string
+	CostCenterDescription      string
+	CostUnit                   string
+	CostUnitDescription        string
+	Created                    _bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Date                       _bigquery.NullTimestamp
+	Description                string
+	Division                   int32
+	Document                   string
+	DocumentNumber             int32
+	DocumentSubject            string
+	EntryID                    string
+	EntryNumber                int32
+	ExchangeRate               float64
+	GLAccount                  string
+	GLAccountCode              string
+	GLAccountDescription       string
+	LineNumber                 int32
+	Modified                   _bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	Notes                      string
+	OffsetID                   string
+	OurRef                     int32
+	Project                    string
+	ProjectCode                string
+	ProjectDescription         string
+	Quantity                   float64
+	VATCode                    string
+	VATCodeDescription         string
+	VATPercentage              float64
+	VATType                    string
 }
 
-func getBankEntryLine(c *financialtransaction.BankEntryLine, organisationID int64, softwareClientLicenceID int64) BankEntryLine {
+func getBankEntryLine(c *financialtransaction.BankEntryLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) BankEntryLine {
 	t := time.Now()
 
 	return BankEntryLine{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Account.String(),
@@ -120,7 +122,7 @@ func getBankEntryLine(c *financialtransaction.BankEntryLine, organisationID int6
 	}
 }
 
-func (service *Service) WriteBankEntryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBankEntryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -155,7 +157,7 @@ func (service *Service) WriteBankEntryLines(bucketHandle *storage.BucketHandle, 
 		for _, tl := range *bankEntryLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getBankEntryLine(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getBankEntryLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

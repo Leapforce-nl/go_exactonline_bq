@@ -17,6 +17,7 @@ import (
 type PurchaseOrder struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	SoftwareClientLicenseGuid_    string
 	Created_                      time.Time
 	Modified_                     time.Time
 	PurchaseOrderID               string
@@ -72,12 +73,13 @@ type PurchaseOrder struct {
 	YourRef                       string
 }
 
-func getPurchaseOrder(c *purchaseorder.PurchaseOrder, organisationID int64, softwareClientLicenceID int64) PurchaseOrder {
+func getPurchaseOrder(c *purchaseorder.PurchaseOrder, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PurchaseOrder {
 	t := time.Now()
 
 	return PurchaseOrder{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.PurchaseOrderID.String(),
 		c.AmountDC,
@@ -133,7 +135,7 @@ func getPurchaseOrder(c *purchaseorder.PurchaseOrder, organisationID int64, soft
 	}
 }
 
-func (service *Service) WritePurchaseOrders(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseOrders(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -168,7 +170,7 @@ func (service *Service) WritePurchaseOrders(bucketHandle *storage.BucketHandle, 
 		for _, tl := range *purchaseOrders {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseOrder(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getPurchaseOrder(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

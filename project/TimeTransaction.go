@@ -16,62 +16,64 @@ import (
 )
 
 type TimeTransaction struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Account                  string
-	AccountName              string
-	Activity                 string
-	ActivityDescription      string
-	Amount                   float64
-	AmountFC                 float64
-	Attachment               string
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Currency                 string
-	Date                     bigquery.NullTimestamp
-	Division                 int64
-	DivisionDescription      string
-	Employee                 string
-	EndTime                  bigquery.NullTimestamp
-	EntryNumber              int64
-	ErrorText                string
-	HourStatus               int64
-	Item                     string
-	ItemDescription          string
-	ItemDivisable            bool
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	Notes                    string
-	Price                    float64
-	PriceFC                  float64
-	Project                  string
-	ProjectAccount           string
-	ProjectAccountCode       string
-	ProjectAccountName       string
-	ProjectCode              string
-	ProjectDescription       string
-	Quantity                 float64
-	StartTime                bigquery.NullTimestamp
-	Subscription             string
-	SubscriptionAccount      string
-	SubscriptionAccountCode  string
-	SubscriptionAccountName  string
-	SubscriptionDescription  string
-	SubscriptionNumber       int64
-	Type                     int64
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Account                    string
+	AccountName                string
+	Activity                   string
+	ActivityDescription        string
+	Amount                     float64
+	AmountFC                   float64
+	Attachment                 string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Currency                   string
+	Date                       bigquery.NullTimestamp
+	Division                   int64
+	DivisionDescription        string
+	Employee                   string
+	EndTime                    bigquery.NullTimestamp
+	EntryNumber                int64
+	ErrorText                  string
+	HourStatus                 int64
+	Item                       string
+	ItemDescription            string
+	ItemDivisable              bool
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	Notes                      string
+	Price                      float64
+	PriceFC                    float64
+	Project                    string
+	ProjectAccount             string
+	ProjectAccountCode         string
+	ProjectAccountName         string
+	ProjectCode                string
+	ProjectDescription         string
+	Quantity                   float64
+	StartTime                  bigquery.NullTimestamp
+	Subscription               string
+	SubscriptionAccount        string
+	SubscriptionAccountCode    string
+	SubscriptionAccountName    string
+	SubscriptionDescription    string
+	SubscriptionNumber         int64
+	Type                       int64
 }
 
-func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwareClientLicenceID int64) TimeTransaction {
+func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) TimeTransaction {
 	t := time.Now()
 
 	return TimeTransaction{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Account.String(),
@@ -120,7 +122,7 @@ func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwa
 	}
 }
 
-func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -155,7 +157,7 @@ func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle
 		for _, tl := range *timeTransactions {
 			batchRowCount++
 
-			b, err := json.Marshal(getTimeTransaction(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getTimeTransaction(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

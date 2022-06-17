@@ -17,6 +17,7 @@ import (
 type SalesOrderGoodsDelivery struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	SoftwareClientLicenseGuid_    string
 	Created_                      time.Time
 	Modified_                     time.Time
 	Timestamp                     int64
@@ -50,7 +51,7 @@ type SalesOrderGoodsDelivery struct {
 	WarehouseDescription          string
 }
 
-func getSalesOrderGoodsDelivery(c *sync.SalesOrderGoodsDelivery, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) SalesOrderGoodsDelivery {
+func getSalesOrderGoodsDelivery(c *sync.SalesOrderGoodsDelivery, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderGoodsDelivery {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -61,6 +62,7 @@ func getSalesOrderGoodsDelivery(c *sync.SalesOrderGoodsDelivery, organisationID 
 	return SalesOrderGoodsDelivery{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.EntryID.String(),
@@ -94,7 +96,7 @@ func getSalesOrderGoodsDelivery(c *sync.SalesOrderGoodsDelivery, organisationID 
 	}
 }
 
-func (service *Service) WriteSalesOrderGoodsDeliveries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteSalesOrderGoodsDeliveries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -131,7 +133,7 @@ func (service *Service) WriteSalesOrderGoodsDeliveries(bucketHandle *storage.Buc
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesOrderGoodsDelivery(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getSalesOrderGoodsDelivery(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

@@ -16,35 +16,37 @@ import (
 )
 
 type PayablesList struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	HID                      string
-	AccountCode              string
-	AccountId                string
-	AccountName              string
-	Amount                   float64
-	AmountInTransit          float64
-	ApprovalStatus           int16
-	CurrencyCode             string
-	Description              string
-	DueDate                  bigquery.NullTimestamp
-	EntryNumber              int32
-	Id                       string
-	InvoiceDate              bigquery.NullTimestamp
-	InvoiceNumber            int32
-	JournalCode              string
-	JournalDescription       string
-	YourRef                  string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	HID                        string
+	AccountCode                string
+	AccountId                  string
+	AccountName                string
+	Amount                     float64
+	AmountInTransit            float64
+	ApprovalStatus             int16
+	CurrencyCode               string
+	Description                string
+	DueDate                    bigquery.NullTimestamp
+	EntryNumber                int32
+	Id                         string
+	InvoiceDate                bigquery.NullTimestamp
+	InvoiceNumber              int32
+	JournalCode                string
+	JournalDescription         string
+	YourRef                    string
 }
 
-func getPayablesList(c *financial.PayablesList, organisationID int64, softwareClientLicenceID int64) PayablesList {
+func getPayablesList(c *financial.PayablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PayablesList {
 	t := time.Now()
 
 	return PayablesList{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.HID,
 		c.AccountCode,
@@ -66,7 +68,7 @@ func getPayablesList(c *financial.PayablesList, organisationID int64, softwareCl
 	}
 }
 
-func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -102,7 +104,7 @@ func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, o
 		for _, tl := range *payablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getPayablesList(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getPayablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -17,6 +17,7 @@ import (
 type LogisticsSalesItemPrice struct {
 	OrganisationID_            int64
 	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
 	Timestamp                  int64
@@ -45,7 +46,7 @@ type LogisticsSalesItemPrice struct {
 	UnitDescription            string
 }
 
-func getLogisticsSalesItemPrice(c *sync.LogisticsSalesItemPrice, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) LogisticsSalesItemPrice {
+func getLogisticsSalesItemPrice(c *sync.LogisticsSalesItemPrice, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) LogisticsSalesItemPrice {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -56,6 +57,7 @@ func getLogisticsSalesItemPrice(c *sync.LogisticsSalesItemPrice, organisationID 
 	return LogisticsSalesItemPrice{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.ID.String(),
@@ -84,7 +86,7 @@ func getLogisticsSalesItemPrice(c *sync.LogisticsSalesItemPrice, organisationID 
 	}
 }
 
-func (service *Service) WriteLogisticsSalesItemPrices(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteLogisticsSalesItemPrices(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -121,7 +123,7 @@ func (service *Service) WriteLogisticsSalesItemPrices(bucketHandle *storage.Buck
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getLogisticsSalesItemPrice(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getLogisticsSalesItemPrice(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

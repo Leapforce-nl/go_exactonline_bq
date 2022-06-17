@@ -18,6 +18,7 @@ import (
 type ItemGroup struct {
 	OrganisationID_                int64
 	SoftwareClientLicenceID_       int64
+	SoftwareClientLicenseGuid_     string
 	Created_                       time.Time
 	Modified_                      time.Time
 	ID                             string
@@ -52,12 +53,13 @@ type ItemGroup struct {
 	Notes                          string
 }
 
-func getItemGroup(c *logistics.ItemGroup, organisationID int64, softwareClientLicenceID int64) ItemGroup {
+func getItemGroup(c *logistics.ItemGroup, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ItemGroup {
 	t := time.Now()
 
 	return ItemGroup{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Code,
@@ -92,7 +94,7 @@ func getItemGroup(c *logistics.ItemGroup, organisationID int64, softwareClientLi
 	}
 }
 
-func (service *Service) WriteItemGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteItemGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -131,7 +133,7 @@ func (service *Service) WriteItemGroups(bucketHandle *storage.BucketHandle, orga
 		for _, tl := range *itemGroups {
 			batchRowCount++
 
-			b, err := json.Marshal(getItemGroup(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getItemGroup(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

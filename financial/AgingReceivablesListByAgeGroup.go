@@ -14,36 +14,38 @@ import (
 )
 
 type AgingReceivablesListByAgeGroup struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	AgeGroup                 int
-	AccountID                string
-	AccountCode              string
-	AccountName              string
-	AgeGroup1                int32
-	AgeGroup1Amount          float64
-	AgeGroup1Description     string
-	AgeGroup2                int32
-	AgeGroup2Amount          float64
-	AgeGroup2Description     string
-	AgeGroup3                int32
-	AgeGroup3Amount          float64
-	AgeGroup3Description     string
-	AgeGroup4                int32
-	AgeGroup4Amount          float64
-	AgeGroup4Description     string
-	CurrencyCode             string
-	TotalAmount              float64
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	AgeGroup                   int
+	AccountID                  string
+	AccountCode                string
+	AccountName                string
+	AgeGroup1                  int32
+	AgeGroup1Amount            float64
+	AgeGroup1Description       string
+	AgeGroup2                  int32
+	AgeGroup2Amount            float64
+	AgeGroup2Description       string
+	AgeGroup3                  int32
+	AgeGroup3Amount            float64
+	AgeGroup3Description       string
+	AgeGroup4                  int32
+	AgeGroup4Amount            float64
+	AgeGroup4Description       string
+	CurrencyCode               string
+	TotalAmount                float64
 }
 
-func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64) AgingReceivablesListByAgeGroup {
+func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) AgingReceivablesListByAgeGroup {
 	t := time.Now()
 
 	return AgingReceivablesListByAgeGroup{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		ageGroup,
 		c.AccountID.String(),
@@ -66,7 +68,7 @@ func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGro
 	}
 }
 
-func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -106,7 +108,7 @@ func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *stora
 			for _, tl := range *agingReceivablesListByAgeGroups {
 				batchRowCount++
 
-				b, err := json.Marshal(getAgingReceivablesListByAgeGroup(&tl, ageGroup, organisationID, softwareClientLicenceID))
+				b, err := json.Marshal(getAgingReceivablesListByAgeGroup(&tl, ageGroup, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 				if err != nil {
 					return nil, 0, nil, errortools.ErrorMessage(err)
 				}

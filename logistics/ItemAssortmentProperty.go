@@ -14,23 +14,25 @@ import (
 )
 
 type ItemAssortmentProperty struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Code                     string
-	Description              string
-	Division                 int32
-	ItemAssortmentCode       int32
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Code                       string
+	Description                string
+	Division                   int32
+	ItemAssortmentCode         int32
 }
 
-func getItemAssortmentProperty(c *logistics.ItemAssortmentProperty, organisationID int64, softwareClientLicenceID int64) ItemAssortmentProperty {
+func getItemAssortmentProperty(c *logistics.ItemAssortmentProperty, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ItemAssortmentProperty {
 	t := time.Now()
 
 	return ItemAssortmentProperty{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Code,
@@ -40,7 +42,7 @@ func getItemAssortmentProperty(c *logistics.ItemAssortmentProperty, organisation
 	}
 }
 
-func (service *Service) WriteItemAssortmentProperties(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteItemAssortmentProperties(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -79,7 +81,7 @@ func (service *Service) WriteItemAssortmentProperties(bucketHandle *storage.Buck
 		for _, tl := range *itemAssortmentProperties {
 			batchRowCount++
 
-			b, err := json.Marshal(getItemAssortmentProperty(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getItemAssortmentProperty(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

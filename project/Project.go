@@ -16,67 +16,69 @@ import (
 )
 
 type Project struct {
-	OrganisationID_           int64
-	SoftwareClientLicenceID_  int64
-	Created_                  time.Time
-	Modified_                 time.Time
-	ID                        string
-	Account                   string
-	AccountCode               string
-	AccountContact            string
-	AccountName               string
-	AllowAdditionalInvoicing  bool
-	BlockEntry                bool
-	BlockRebilling            bool
-	BudgetedAmount            float64
-	BudgetedCosts             float64
-	BudgetedRevenue           float64
-	BudgetOverrunHours        byte
-	BudgetType                int64
-	BudgetTypeDescription     string
-	Classification            string
-	ClassificationDescription string
-	Code                      string
-	CostsAmountFC             float64
-	Created                   bigquery.NullTimestamp
-	Creator                   string
-	CreatorFullName           string
-	CustomerPONumber          string
-	Description               string
-	Division                  int64
-	DivisionName              string
-	EndDate                   bigquery.NullTimestamp
-	FixedPriceItem            string
-	FixedPriceItemDescription string
-	HasWBSLines               bool
-	InternalNotes             string
-	InvoiceAsQuoted           bool
-	Manager                   string
-	ManagerFullname           string
-	MarkupPercentage          float64
-	Modified                  bigquery.NullTimestamp
-	Modifier                  string
-	ModifierFullName          string
-	Notes                     string
-	PrepaidItem               string
-	PrepaidItemDescription    string
-	PrepaidType               int64
-	PrepaidTypeDescription    string
-	SalesTimeQuantity         float64
-	SourceQuotation           string
-	StartDate                 bigquery.NullTimestamp
-	TimeQuantityToAlert       float64
-	Type                      int64
-	TypeDescription           string
-	UseBillingMilestones      bool
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Account                    string
+	AccountCode                string
+	AccountContact             string
+	AccountName                string
+	AllowAdditionalInvoicing   bool
+	BlockEntry                 bool
+	BlockRebilling             bool
+	BudgetedAmount             float64
+	BudgetedCosts              float64
+	BudgetedRevenue            float64
+	BudgetOverrunHours         byte
+	BudgetType                 int64
+	BudgetTypeDescription      string
+	Classification             string
+	ClassificationDescription  string
+	Code                       string
+	CostsAmountFC              float64
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	CustomerPONumber           string
+	Description                string
+	Division                   int64
+	DivisionName               string
+	EndDate                    bigquery.NullTimestamp
+	FixedPriceItem             string
+	FixedPriceItemDescription  string
+	HasWBSLines                bool
+	InternalNotes              string
+	InvoiceAsQuoted            bool
+	Manager                    string
+	ManagerFullname            string
+	MarkupPercentage           float64
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	Notes                      string
+	PrepaidItem                string
+	PrepaidItemDescription     string
+	PrepaidType                int64
+	PrepaidTypeDescription     string
+	SalesTimeQuantity          float64
+	SourceQuotation            string
+	StartDate                  bigquery.NullTimestamp
+	TimeQuantityToAlert        float64
+	Type                       int64
+	TypeDescription            string
+	UseBillingMilestones       bool
 }
 
-func getProject(c *project.Project, organisationID int64, softwareClientLicenceID int64) Project {
+func getProject(c *project.Project, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Project {
 	t := time.Now()
 
 	return Project{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Account.String(),
@@ -130,7 +132,7 @@ func getProject(c *project.Project, organisationID int64, softwareClientLicenceI
 	}
 }
 
-func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -165,7 +167,7 @@ func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, organi
 		for _, tl := range *projects {
 			batchRowCount++
 
-			b, err := json.Marshal(getProject(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getProject(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

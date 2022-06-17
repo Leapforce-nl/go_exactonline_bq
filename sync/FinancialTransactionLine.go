@@ -15,82 +15,83 @@ import (
 )
 
 type FinancialTransactionLine struct {
-	OrganisationID_           int64
-	SoftwareClientLicenceID_  int64
-	Created_                  time.Time
-	Modified_                 time.Time
-	Timestamp                 int64
-	ID                        string
-	Account                   string
-	AccountCode               string
-	AccountName               string
-	AmountDC                  float64
-	AmountFC                  float64
-	AmountVATBaseFC           float64
-	AmountVATFC               float64
-	Asset                     string
-	AssetCode                 string
-	AssetDescription          string
-	CostCenter                string
-	CostCenterDescription     string
-	CostUnit                  string
-	CostUnitDescription       string
-	Created                   bigquery.NullTimestamp
-	Creator                   string
-	CreatorFullName           string
-	Currency                  string
-	Date                      bigquery.NullTimestamp
-	Description               string
-	Division                  int64
-	Document                  string
-	DocumentNumber            int64
-	DocumentSubject           string
-	DueDate                   bigquery.NullTimestamp
-	EntryID                   string
-	EntryNumber               int64
-	ExchangeRate              float64
-	ExtraDutyAmountFC         float64
-	ExtraDutyPercentage       float64
-	FinancialPeriod           int64
-	FinancialYear             int64
-	GLAccount                 string
-	GLAccountCode             string
-	GLAccountDescription      string
-	InvoiceNumber             int64
-	Item                      string
-	ItemCode                  string
-	ItemDescription           string
-	JournalCode               string
-	JournalDescription        string
-	LineNumber                int64
-	LineType                  int64
-	Modified                  bigquery.NullTimestamp
-	Modifier                  string
-	ModifierFullName          string
-	Notes                     string
-	OffsetID                  string
-	OrderNumber               int64
-	PaymentDiscountAmount     float64
-	PaymentReference          string
-	Project                   string
-	ProjectCode               string
-	ProjectDescription        string
-	Quantity                  float64
-	SerialNumber              string
-	Status                    int64
-	Subscription              string
-	SubscriptionDescription   string
-	TrackingNumber            string
-	TrackingNumberDescription string
-	Type                      int64
-	VATCode                   string
-	VATCodeDescription        string
-	VATPercentage             float64
-	VATType                   string
-	YourRef                   string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	Timestamp                  int64
+	ID                         string
+	Account                    string
+	AccountCode                string
+	AccountName                string
+	AmountDC                   float64
+	AmountFC                   float64
+	AmountVATBaseFC            float64
+	AmountVATFC                float64
+	Asset                      string
+	AssetCode                  string
+	AssetDescription           string
+	CostCenter                 string
+	CostCenterDescription      string
+	CostUnit                   string
+	CostUnitDescription        string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Currency                   string
+	Date                       bigquery.NullTimestamp
+	Description                string
+	Division                   int64
+	Document                   string
+	DocumentNumber             int64
+	DocumentSubject            string
+	DueDate                    bigquery.NullTimestamp
+	EntryID                    string
+	EntryNumber                int64
+	ExchangeRate               float64
+	ExtraDutyAmountFC          float64
+	ExtraDutyPercentage        float64
+	FinancialPeriod            int64
+	FinancialYear              int64
+	GLAccount                  string
+	GLAccountCode              string
+	GLAccountDescription       string
+	InvoiceNumber              int64
+	Item                       string
+	ItemCode                   string
+	ItemDescription            string
+	JournalCode                string
+	JournalDescription         string
+	LineNumber                 int64
+	LineType                   int64
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	Notes                      string
+	OffsetID                   string
+	OrderNumber                int64
+	PaymentDiscountAmount      float64
+	PaymentReference           string
+	Project                    string
+	ProjectCode                string
+	ProjectDescription         string
+	Quantity                   float64
+	SerialNumber               string
+	Status                     int64
+	Subscription               string
+	SubscriptionDescription    string
+	TrackingNumber             string
+	TrackingNumberDescription  string
+	Type                       int64
+	VATCode                    string
+	VATCodeDescription         string
+	VATPercentage              float64
+	VATType                    string
+	YourRef                    string
 }
 
-func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) FinancialTransactionLine {
+func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialTransactionLine {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -101,6 +102,7 @@ func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationI
 	return FinancialTransactionLine{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.Timestamp.Value(),
 		c.ID.String(),
@@ -174,7 +176,7 @@ func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationI
 	}
 }
 
-func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -211,7 +213,7 @@ func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.Buc
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getFinancialTransactionLine(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getFinancialTransactionLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

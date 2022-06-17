@@ -14,21 +14,23 @@ import (
 )
 
 type RevenueList struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	Period                   int32
-	Year                     int32
-	Amount                   float64
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	Period                     int32
+	Year                       int32
+	Amount                     float64
 }
 
-func getRevenueList(c *financial.RevenueList, organisationID int64, softwareClientLicenceID int64) RevenueList {
+func getRevenueList(c *financial.RevenueList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) RevenueList {
 	t := time.Now()
 
 	return RevenueList{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.Period,
 		c.Year,
@@ -36,7 +38,7 @@ func getRevenueList(c *financial.RevenueList, organisationID int64, softwareClie
 	}
 }
 
-func (service *Service) WriteRevenueLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteRevenueLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -71,7 +73,7 @@ func (service *Service) WriteRevenueLists(bucketHandle *storage.BucketHandle, or
 		for _, tl := range *revenueLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getRevenueList(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getRevenueList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

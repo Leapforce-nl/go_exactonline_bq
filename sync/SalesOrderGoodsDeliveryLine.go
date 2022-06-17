@@ -15,12 +15,13 @@ import (
 )
 
 type SalesOrderGoodsDeliveryLine struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	Timestamp                int64
-	ID                       string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	Timestamp                  int64
+	ID                         string
 	//BatchNumbers
 	Created                    bigquery.NullTimestamp
 	Creator                    string
@@ -50,7 +51,7 @@ type SalesOrderGoodsDeliveryLine struct {
 	Unitcode                   string
 }
 
-func getSalesOrderGoodsDeliveryLine(c *sync.SalesOrderGoodsDeliveryLine, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) SalesOrderGoodsDeliveryLine {
+func getSalesOrderGoodsDeliveryLine(c *sync.SalesOrderGoodsDeliveryLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderGoodsDeliveryLine {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -61,6 +62,7 @@ func getSalesOrderGoodsDeliveryLine(c *sync.SalesOrderGoodsDeliveryLine, organis
 	return SalesOrderGoodsDeliveryLine{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.ID.String(),
@@ -94,7 +96,7 @@ func getSalesOrderGoodsDeliveryLine(c *sync.SalesOrderGoodsDeliveryLine, organis
 	}
 }
 
-func (service *Service) WriteSalesOrderGoodsDeliveryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteSalesOrderGoodsDeliveryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -131,7 +133,7 @@ func (service *Service) WriteSalesOrderGoodsDeliveryLines(bucketHandle *storage.
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesOrderGoodsDeliveryLine(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getSalesOrderGoodsDeliveryLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

@@ -16,34 +16,36 @@ import (
 )
 
 type EmploymentInternalRate struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Division                 int64
-	Employee                 string
-	EmployeeFullName         string
-	EmployeeHID              int64
-	Employment               string
-	EmploymentHID            int64
-	EndDate                  bigquery.NullTimestamp
-	InternalRate             float64
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	StartDate                bigquery.NullTimestamp
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Division                   int64
+	Employee                   string
+	EmployeeFullName           string
+	EmployeeHID                int64
+	Employment                 string
+	EmploymentHID              int64
+	EndDate                    bigquery.NullTimestamp
+	InternalRate               float64
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	StartDate                  bigquery.NullTimestamp
 }
 
-func getEmploymentInternalRate(c *project.EmploymentInternalRate, organisationID int64, softwareClientLicenceID int64) EmploymentInternalRate {
+func getEmploymentInternalRate(c *project.EmploymentInternalRate, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) EmploymentInternalRate {
 	t := time.Now()
 
 	return EmploymentInternalRate{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		go_bigquery.DateToNullTimestamp(c.Created),
@@ -64,7 +66,7 @@ func getEmploymentInternalRate(c *project.EmploymentInternalRate, organisationID
 	}
 }
 
-func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -99,7 +101,7 @@ func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.Bucke
 		for _, tl := range *employmentInternalRates {
 			batchRowCount++
 
-			b, err := json.Marshal(getEmploymentInternalRate(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getEmploymentInternalRate(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

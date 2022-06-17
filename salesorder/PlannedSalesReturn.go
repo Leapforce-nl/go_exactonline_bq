@@ -18,6 +18,7 @@ import (
 type PlannedSalesReturn struct {
 	OrganisationID_                  int64
 	SoftwareClientLicenceID_         int64
+	SoftwareClientLicenseGuid_       string
 	Created_                         time.Time
 	Modified_                        time.Time
 	PlannedSalesReturnID             string
@@ -47,12 +48,13 @@ type PlannedSalesReturn struct {
 	WarehouseDescription string
 }
 
-func getPlannedSalesReturn(c *salesorder.PlannedSalesReturn, organisationID int64, softwareClientLicenceID int64) PlannedSalesReturn {
+func getPlannedSalesReturn(c *salesorder.PlannedSalesReturn, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PlannedSalesReturn {
 	t := time.Now()
 
 	return PlannedSalesReturn{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.PlannedSalesReturnID.String(),
 		go_bigquery.DateToNullTimestamp(c.Created),
@@ -82,7 +84,7 @@ func getPlannedSalesReturn(c *salesorder.PlannedSalesReturn, organisationID int6
 	}
 }
 
-func (service *Service) WritePlannedSalesReturns(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePlannedSalesReturns(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -117,7 +119,7 @@ func (service *Service) WritePlannedSalesReturns(bucketHandle *storage.BucketHan
 		for _, tl := range *plannedSalesReturns {
 			batchRowCount++
 
-			b, err := json.Marshal(getPlannedSalesReturn(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getPlannedSalesReturn(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -16,43 +16,45 @@ import (
 )
 
 type Budget struct {
-	OrganisationID_           int64
-	SoftwareClientLicenceID_  int64
-	Created_                  time.Time
-	Modified_                 time.Time
-	ID                        string
-	AmountDC                  float64
-	BudgetScenario            string
-	BudgetScenarioCode        string
-	BudgetScenarioDescription string
-	Costcenter                string
-	CostcenterDescription     string
-	Costunit                  string
-	CostunitDescription       string
-	Created                   _bigquery.NullTimestamp
-	Creator                   string
-	CreatorFullName           string
-	Division                  int32
-	GLAccount                 string
-	GLAccountCode             string
-	GLAccountDescription      string
-	HID                       string
-	Item                      string
-	ItemCode                  string
-	ItemDescription           string
-	Modified                  _bigquery.NullTimestamp
-	Modifier                  string
-	ModifierFullName          string
-	ReportingPeriod           int16
-	ReportingYear             int16
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	AmountDC                   float64
+	BudgetScenario             string
+	BudgetScenarioCode         string
+	BudgetScenarioDescription  string
+	Costcenter                 string
+	CostcenterDescription      string
+	Costunit                   string
+	CostunitDescription        string
+	Created                    _bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Division                   int32
+	GLAccount                  string
+	GLAccountCode              string
+	GLAccountDescription       string
+	HID                        string
+	Item                       string
+	ItemCode                   string
+	ItemDescription            string
+	Modified                   _bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	ReportingPeriod            int16
+	ReportingYear              int16
 }
 
-func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID int64) Budget {
+func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Budget {
 	t := time.Now()
 
 	return Budget{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.AmountDC,
@@ -82,7 +84,7 @@ func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID i
 	}
 }
 
-func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -117,7 +119,7 @@ func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organ
 		for _, tl := range *budgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getBudget(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getBudget(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

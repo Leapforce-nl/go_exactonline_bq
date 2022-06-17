@@ -14,35 +14,37 @@ import (
 )
 
 type AgingReceivablesList struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	AccountID                string
-	AccountCode              string
-	AccountName              string
-	AgeGroup1                int32
-	AgeGroup1Amount          float64
-	AgeGroup1Description     string
-	AgeGroup2                int32
-	AgeGroup2Amount          float64
-	AgeGroup2Description     string
-	AgeGroup3                int32
-	AgeGroup3Amount          float64
-	AgeGroup3Description     string
-	AgeGroup4                int32
-	AgeGroup4Amount          float64
-	AgeGroup4Description     string
-	CurrencyCode             string
-	TotalAmount              float64
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	AccountID                  string
+	AccountCode                string
+	AccountName                string
+	AgeGroup1                  int32
+	AgeGroup1Amount            float64
+	AgeGroup1Description       string
+	AgeGroup2                  int32
+	AgeGroup2Amount            float64
+	AgeGroup2Description       string
+	AgeGroup3                  int32
+	AgeGroup3Amount            float64
+	AgeGroup3Description       string
+	AgeGroup4                  int32
+	AgeGroup4Amount            float64
+	AgeGroup4Description       string
+	CurrencyCode               string
+	TotalAmount                float64
 }
 
-func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID int64, softwareClientLicenceID int64) AgingReceivablesList {
+func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) AgingReceivablesList {
 	t := time.Now()
 
 	return AgingReceivablesList{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.AccountID.String(),
 		c.AccountCode,
@@ -64,7 +66,7 @@ func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID i
 	}
 }
 
-func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -99,7 +101,7 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 		for _, tl := range *agingReceivablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getAgingReceivablesList(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getAgingReceivablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

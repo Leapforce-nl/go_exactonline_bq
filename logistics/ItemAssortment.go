@@ -14,23 +14,25 @@ import (
 )
 
 type ItemAssortment struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Code                     int32
-	Description              string
-	Division                 int32
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Code                       int32
+	Description                string
+	Division                   int32
 	//Properties  []ItemAssortmentPropertyBQ
 }
 
-func getItemAssortment(c *logistics.ItemAssortment, organisationID int64, softwareClientLicenceID int64) ItemAssortment {
+func getItemAssortment(c *logistics.ItemAssortment, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ItemAssortment {
 	t := time.Now()
 
 	return ItemAssortment{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Code,
@@ -40,7 +42,7 @@ func getItemAssortment(c *logistics.ItemAssortment, organisationID int64, softwa
 	}
 }
 
-func (service *Service) WriteItemAssortments(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteItemAssortments(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -79,7 +81,7 @@ func (service *Service) WriteItemAssortments(bucketHandle *storage.BucketHandle,
 		for _, tl := range *itemAssortments {
 			batchRowCount++
 
-			b, err := json.Marshal(getItemAssortment(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getItemAssortment(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

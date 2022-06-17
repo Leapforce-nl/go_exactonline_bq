@@ -15,112 +15,113 @@ import (
 )
 
 type LogisticsItem struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	Timestamp                int64
-	AverageCost              float64
-	Barcode                  string
-	Class01                  string
-	Class02                  string
-	Class03                  string
-	Class04                  string
-	Class05                  string
-	Class06                  string
-	Class07                  string
-	Class08                  string
-	Class09                  string
-	Class10                  string
-	Code                     string
-	CopyRemarks              byte
-	CostPriceCurrency        string
-	CostPriceNew             float64
-	CostPriceStandard        float64
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Description              string
-	Division                 int32
-	EndDate                  bigquery.NullTimestamp
-	ExtraDescription         string
-	FreeBoolField01          bool
-	FreeBoolField02          bool
-	FreeBoolField03          bool
-	FreeBoolField04          bool
-	FreeBoolField05          bool
-	FreeDateField01          bigquery.NullTimestamp
-	FreeDateField02          bigquery.NullTimestamp
-	FreeDateField03          bigquery.NullTimestamp
-	FreeDateField04          bigquery.NullTimestamp
-	FreeDateField05          bigquery.NullTimestamp
-	FreeNumberField01        float64
-	FreeNumberField02        float64
-	FreeNumberField03        float64
-	FreeNumberField04        float64
-	FreeNumberField05        float64
-	FreeNumberField06        float64
-	FreeNumberField07        float64
-	FreeNumberField08        float64
-	FreeTextField01          string
-	FreeTextField02          string
-	FreeTextField03          string
-	FreeTextField04          string
-	FreeTextField05          string
-	FreeTextField06          string
-	FreeTextField07          string
-	FreeTextField08          string
-	FreeTextField09          string
-	FreeTextField10          string
-	GLCosts                  string
-	GLCostsCode              string
-	GLCostsDescription       string
-	GLRevenue                string
-	GLRevenueCode            string
-	GLRevenueDescription     string
-	GLStock                  string
-	GLStockCode              string
-	GLStockDescription       string
-	GrossWeight              float64
-	ID                       string
-	IsBatchItem              byte
-	IsFractionAllowedItem    bool
-	IsMakeItem               byte
-	IsNewContract            byte
-	IsOnDemandItem           byte
-	IsPackageItem            bool
-	IsPurchaseItem           bool
-	IsSalesItem              bool
-	IsSerialItem             bool
-	IsStockItem              bool
-	IsSubcontractedItem      bool
-	IsTaxableItem            byte
-	IsTime                   byte
-	IsWebshopItem            byte
-	ItemGroup                string
-	ItemGroupCode            string
-	ItemGroupDescription     string
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	NetWeight                float64
-	NetWeightUnit            string
-	Notes                    string
-	PictureName              string
-	PictureThumbnailURL      string
-	PictureURL               string
-	SalesVATCode             string
-	SalesVATCodeDescription  string
-	SearchCode               string
-	SecurityLevel            int32
-	StartDate                bigquery.NullTimestamp
-	Stock                    float64
-	Unit                     string
-	UnitDescription          string
-	UnitType                 string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	Timestamp                  int64
+	AverageCost                float64
+	Barcode                    string
+	Class01                    string
+	Class02                    string
+	Class03                    string
+	Class04                    string
+	Class05                    string
+	Class06                    string
+	Class07                    string
+	Class08                    string
+	Class09                    string
+	Class10                    string
+	Code                       string
+	CopyRemarks                byte
+	CostPriceCurrency          string
+	CostPriceNew               float64
+	CostPriceStandard          float64
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Description                string
+	Division                   int32
+	EndDate                    bigquery.NullTimestamp
+	ExtraDescription           string
+	FreeBoolField01            bool
+	FreeBoolField02            bool
+	FreeBoolField03            bool
+	FreeBoolField04            bool
+	FreeBoolField05            bool
+	FreeDateField01            bigquery.NullTimestamp
+	FreeDateField02            bigquery.NullTimestamp
+	FreeDateField03            bigquery.NullTimestamp
+	FreeDateField04            bigquery.NullTimestamp
+	FreeDateField05            bigquery.NullTimestamp
+	FreeNumberField01          float64
+	FreeNumberField02          float64
+	FreeNumberField03          float64
+	FreeNumberField04          float64
+	FreeNumberField05          float64
+	FreeNumberField06          float64
+	FreeNumberField07          float64
+	FreeNumberField08          float64
+	FreeTextField01            string
+	FreeTextField02            string
+	FreeTextField03            string
+	FreeTextField04            string
+	FreeTextField05            string
+	FreeTextField06            string
+	FreeTextField07            string
+	FreeTextField08            string
+	FreeTextField09            string
+	FreeTextField10            string
+	GLCosts                    string
+	GLCostsCode                string
+	GLCostsDescription         string
+	GLRevenue                  string
+	GLRevenueCode              string
+	GLRevenueDescription       string
+	GLStock                    string
+	GLStockCode                string
+	GLStockDescription         string
+	GrossWeight                float64
+	ID                         string
+	IsBatchItem                byte
+	IsFractionAllowedItem      bool
+	IsMakeItem                 byte
+	IsNewContract              byte
+	IsOnDemandItem             byte
+	IsPackageItem              bool
+	IsPurchaseItem             bool
+	IsSalesItem                bool
+	IsSerialItem               bool
+	IsStockItem                bool
+	IsSubcontractedItem        bool
+	IsTaxableItem              byte
+	IsTime                     byte
+	IsWebshopItem              byte
+	ItemGroup                  string
+	ItemGroupCode              string
+	ItemGroupDescription       string
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	NetWeight                  float64
+	NetWeightUnit              string
+	Notes                      string
+	PictureName                string
+	PictureThumbnailURL        string
+	PictureURL                 string
+	SalesVATCode               string
+	SalesVATCodeDescription    string
+	SearchCode                 string
+	SecurityLevel              int32
+	StartDate                  bigquery.NullTimestamp
+	Stock                      float64
+	Unit                       string
+	UnitDescription            string
+	UnitType                   string
 }
 
-func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) LogisticsItem {
+func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) LogisticsItem {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -131,6 +132,7 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 	return LogisticsItem{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.AverageCost,
@@ -234,7 +236,7 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 	}
 }
 
-func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -271,7 +273,7 @@ func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, 
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getLogisticsItem(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getLogisticsItem(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

@@ -14,36 +14,38 @@ import (
 )
 
 type ReportingBalance struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Amount                   float64
-	AmountCredit             float64
-	AmountDebit              float64
-	BalanceType              string
-	CostCenterCode           string
-	CostCenterDescription    string
-	CostUnitCode             string
-	CostUnitDescription      string
-	Count                    int32
-	Division                 int32
-	GLAccount                string
-	GLAccountCode            string
-	GLAccountDescription     string
-	ReportingPeriod          int32
-	ReportingYear            int32
-	Status                   int32
-	Type                     int32
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Amount                     float64
+	AmountCredit               float64
+	AmountDebit                float64
+	BalanceType                string
+	CostCenterCode             string
+	CostCenterDescription      string
+	CostUnitCode               string
+	CostUnitDescription        string
+	Count                      int32
+	Division                   int32
+	GLAccount                  string
+	GLAccountCode              string
+	GLAccountDescription       string
+	ReportingPeriod            int32
+	ReportingYear              int32
+	Status                     int32
+	Type                       int32
 }
 
-func getReportingBalance(c *financial.ReportingBalance, organisationID int64, softwareClientLicenceID int64) ReportingBalance {
+func getReportingBalance(c *financial.ReportingBalance, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ReportingBalance {
 	t := time.Now()
 
 	return ReportingBalance{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID,
 		c.Amount,
@@ -66,7 +68,7 @@ func getReportingBalance(c *financial.ReportingBalance, organisationID int64, so
 	}
 }
 
-func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -101,7 +103,7 @@ func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandl
 		for _, tl := range *reportingBalances {
 			batchRowCount++
 
-			b, err := json.Marshal(getReportingBalance(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getReportingBalance(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

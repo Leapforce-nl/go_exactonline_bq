@@ -16,68 +16,70 @@ import (
 )
 
 type PurchaseOrderLine struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	AmountDC                 float64
-	AmountFC                 float64
-	CostCenter               string
-	CostCenterDescription    string
-	CostUnit                 string
-	CostUnitDescription      string
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Description              string
-	Discount                 float64
-	Division                 int32
-	Expense                  string
-	ExpenseDescription       string
-	InStock                  float64
-	InvoicedQuantity         float64
-	Item                     string
-	ItemCode                 string
-	ItemDescription          string
-	ItemDivisable            bool
-	LineNumber               int32
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	NetPrice                 float64
-	Notes                    string
-	Project                  string
-	ProjectCode              string
-	ProjectDescription       string
-	ProjectedStock           float64
-	PurchaseOrderID          string
-	Quantity                 float64
-	QuantityInPurchaseUnits  float64
-	Rebill                   bool
-	ReceiptDate              bigquery.NullTimestamp
-	ReceivedQuantity         float64
-	SalesOrder               string
-	SalesOrderLine           string
-	SalesOrderLineNumber     int32
-	SalesOrderNumber         int32
-	SupplierItemCode         string
-	SupplierItemCopyRemarks  byte
-	Unit                     string
-	UnitDescription          string
-	UnitPrice                float64
-	VATAmount                float64
-	VATCode                  string
-	VATDescription           string
-	VATPercentage            float64
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	AmountDC                   float64
+	AmountFC                   float64
+	CostCenter                 string
+	CostCenterDescription      string
+	CostUnit                   string
+	CostUnitDescription        string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Description                string
+	Discount                   float64
+	Division                   int32
+	Expense                    string
+	ExpenseDescription         string
+	InStock                    float64
+	InvoicedQuantity           float64
+	Item                       string
+	ItemCode                   string
+	ItemDescription            string
+	ItemDivisable              bool
+	LineNumber                 int32
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	NetPrice                   float64
+	Notes                      string
+	Project                    string
+	ProjectCode                string
+	ProjectDescription         string
+	ProjectedStock             float64
+	PurchaseOrderID            string
+	Quantity                   float64
+	QuantityInPurchaseUnits    float64
+	Rebill                     bool
+	ReceiptDate                bigquery.NullTimestamp
+	ReceivedQuantity           float64
+	SalesOrder                 string
+	SalesOrderLine             string
+	SalesOrderLineNumber       int32
+	SalesOrderNumber           int32
+	SupplierItemCode           string
+	SupplierItemCopyRemarks    byte
+	Unit                       string
+	UnitDescription            string
+	UnitPrice                  float64
+	VATAmount                  float64
+	VATCode                    string
+	VATDescription             string
+	VATPercentage              float64
 }
 
-func getPurchaseOrderLine(c *purchaseorder.PurchaseOrderLine, organisationID int64, softwareClientLicenceID int64) PurchaseOrderLine {
+func getPurchaseOrderLine(c *purchaseorder.PurchaseOrderLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PurchaseOrderLine {
 	t := time.Now()
 
 	return PurchaseOrderLine{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.AmountDC,
@@ -132,7 +134,7 @@ func getPurchaseOrderLine(c *purchaseorder.PurchaseOrderLine, organisationID int
 	}
 }
 
-func (service *Service) WritePurchaseOrderLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseOrderLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -167,7 +169,7 @@ func (service *Service) WritePurchaseOrderLines(bucketHandle *storage.BucketHand
 		for _, tl := range *purchaseOrderLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseOrderLine(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getPurchaseOrderLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

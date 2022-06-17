@@ -16,11 +16,12 @@ import (
 )
 
 type BankEntry struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	EntryID                  string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	EntryID                    string
 	//BankEntryLines
 	BankStatementDocument        string
 	BankStatementDocumentNumber  int32
@@ -40,12 +41,13 @@ type BankEntry struct {
 	StatusDescription            string
 }
 
-func getBankEntry(c *financialtransaction.BankEntry, organisationID int64, softwareClientLicenceID int64) BankEntry {
+func getBankEntry(c *financialtransaction.BankEntry, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) BankEntry {
 	t := time.Now()
 
 	return BankEntry{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.EntryID.String(),
 		//c.BankEntryLines,
@@ -68,7 +70,7 @@ func getBankEntry(c *financialtransaction.BankEntry, organisationID int64, softw
 	}
 }
 
-func (service *Service) WriteBankEntries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBankEntries(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -103,7 +105,7 @@ func (service *Service) WriteBankEntries(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *bankEntries {
 			batchRowCount++
 
-			b, err := json.Marshal(getBankEntry(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getBankEntry(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

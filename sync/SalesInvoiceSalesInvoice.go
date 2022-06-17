@@ -17,6 +17,7 @@ import (
 type SalesInvoiceSalesInvoice struct {
 	OrganisationID_                      int64
 	SoftwareClientLicenceID_             int64
+	SoftwareClientLicenseGuid_           string
 	Created_                             time.Time
 	Modified_                            time.Time
 	Timestamp                            int64
@@ -118,7 +119,7 @@ type SalesInvoiceSalesInvoice struct {
 	YourRef                              string
 }
 
-func getSalesInvoiceSalesInvoice(c *sync.SalesInvoiceSalesInvoice, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) SalesInvoiceSalesInvoice {
+func getSalesInvoiceSalesInvoice(c *sync.SalesInvoiceSalesInvoice, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) SalesInvoiceSalesInvoice {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -129,6 +130,7 @@ func getSalesInvoiceSalesInvoice(c *sync.SalesInvoiceSalesInvoice, organisationI
 	return SalesInvoiceSalesInvoice{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.ID.String(),
@@ -230,7 +232,7 @@ func getSalesInvoiceSalesInvoice(c *sync.SalesInvoiceSalesInvoice, organisationI
 	}
 }
 
-func (service *Service) WriteSalesInvoiceSalesInvoices(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteSalesInvoiceSalesInvoices(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -267,7 +269,7 @@ func (service *Service) WriteSalesInvoiceSalesInvoices(bucketHandle *storage.Buc
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesInvoiceSalesInvoice(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getSalesInvoiceSalesInvoice(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

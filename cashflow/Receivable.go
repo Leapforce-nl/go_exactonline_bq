@@ -18,6 +18,7 @@ import (
 type Receivable struct {
 	OrganisationID_               int64
 	SoftwareClientLicenceID_      int64
+	SoftwareClientLicenseGuid_    string
 	Created_                      time.Time
 	Modified_                     time.Time
 	ID                            string
@@ -100,12 +101,13 @@ type Receivable struct {
 	YourRef                       string
 }
 
-func getReceivable(c *cashflow.Receivable, organisationID int64, softwareClientLicenceID int64) Receivable {
+func getReceivable(c *cashflow.Receivable, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Receivable {
 	t := time.Now()
 
 	return Receivable{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.Account.String(),
@@ -188,7 +190,7 @@ func getReceivable(c *cashflow.Receivable, organisationID int64, softwareClientL
 	}
 }
 
-func (service *Service) WriteReceivablesBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReceivablesBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -223,7 +225,7 @@ func (service *Service) WriteReceivablesBQ(bucketHandle *storage.BucketHandle, o
 		for _, tl := range *receivables {
 			batchRowCount++
 
-			b, err := json.Marshal(getReceivable(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getReceivable(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -17,6 +17,7 @@ import (
 type CRMAccount struct {
 	OrganisationID_                     int64
 	SoftwareClientLicenceID_            int64
+	SoftwareClientLicenseGuid_          string
 	Created_                            time.Time
 	Modified_                           time.Time
 	Timestamp                           int64
@@ -168,7 +169,7 @@ type CRMAccount struct {
 	Website                             string
 }
 
-func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) CRMAccount {
+func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) CRMAccount {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -179,6 +180,7 @@ func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicen
 	return CRMAccount{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.Accountant.String(),
@@ -332,7 +334,7 @@ func getCRMAccount(c *sync.CRMAccount, organisationID int64, softwareClientLicen
 	}
 }
 
-func (service *Service) WriteCRMAccounts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteCRMAccounts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -369,7 +371,7 @@ func (service *Service) WriteCRMAccounts(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getCRMAccount(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getCRMAccount(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

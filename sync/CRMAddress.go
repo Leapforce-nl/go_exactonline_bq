@@ -15,67 +15,68 @@ import (
 )
 
 type CRMAddress struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	Timestamp                int64
-	Account                  string
-	AccountIsSupplier        bool
-	AccountName              string
-	AddressLine1             string
-	AddressLine2             string
-	AddressLine3             string
-	City                     string
-	Contact                  string
-	ContactName              string
-	Country                  string
-	CountryName              string
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Division                 int32
-	Fax                      string
-	FreeBoolField01          bool
-	FreeBoolField02          bool
-	FreeBoolField03          bool
-	FreeBoolField04          bool
-	FreeBoolField05          bool
-	FreeDateField01          bigquery.NullTimestamp
-	FreeDateField02          bigquery.NullTimestamp
-	FreeDateField03          bigquery.NullTimestamp
-	FreeDateField04          bigquery.NullTimestamp
-	FreeDateField05          bigquery.NullTimestamp
-	FreeNumberField01        float64
-	FreeNumberField02        float64
-	FreeNumberField03        float64
-	FreeNumberField04        float64
-	FreeNumberField05        float64
-	FreeTextField01          string
-	FreeTextField02          string
-	FreeTextField03          string
-	FreeTextField04          string
-	FreeTextField05          string
-	ID                       string
-	Mailbox                  string
-	Main                     bool
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	NicNumber                string
-	Notes                    string
-	Phone                    string
-	PhoneExtension           string
-	Postcode                 string
-	State                    string
-	StateDescription         string
-	Type                     int16
-	Warehouse                string
-	WarehouseCode            string
-	WarehouseDescription     string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	Timestamp                  int64
+	Account                    string
+	AccountIsSupplier          bool
+	AccountName                string
+	AddressLine1               string
+	AddressLine2               string
+	AddressLine3               string
+	City                       string
+	Contact                    string
+	ContactName                string
+	Country                    string
+	CountryName                string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Division                   int32
+	Fax                        string
+	FreeBoolField01            bool
+	FreeBoolField02            bool
+	FreeBoolField03            bool
+	FreeBoolField04            bool
+	FreeBoolField05            bool
+	FreeDateField01            bigquery.NullTimestamp
+	FreeDateField02            bigquery.NullTimestamp
+	FreeDateField03            bigquery.NullTimestamp
+	FreeDateField04            bigquery.NullTimestamp
+	FreeDateField05            bigquery.NullTimestamp
+	FreeNumberField01          float64
+	FreeNumberField02          float64
+	FreeNumberField03          float64
+	FreeNumberField04          float64
+	FreeNumberField05          float64
+	FreeTextField01            string
+	FreeTextField02            string
+	FreeTextField03            string
+	FreeTextField04            string
+	FreeTextField05            string
+	ID                         string
+	Mailbox                    string
+	Main                       bool
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	NicNumber                  string
+	Notes                      string
+	Phone                      string
+	PhoneExtension             string
+	Postcode                   string
+	State                      string
+	StateDescription           string
+	Type                       int16
+	Warehouse                  string
+	WarehouseCode              string
+	WarehouseDescription       string
 }
 
-func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicenceID int64, maxTimestamp *int64) CRMAddress {
+func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) CRMAddress {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -86,6 +87,7 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 	return CRMAddress{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
 		c.Account.String(),
@@ -144,7 +146,7 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 	}
 }
 
-func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -181,7 +183,7 @@ func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getCRMAddress(&tl, organisationID, softwareClientLicenceID, &maxTimestamp))
+			b, err := json.Marshal(getCRMAddress(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

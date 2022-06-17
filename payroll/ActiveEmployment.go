@@ -16,62 +16,64 @@ import (
 )
 
 type ActiveEmployment struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	AverageDaysPerWeek       float64
-	AverageHoursPerWeek      float64
-	Contract                 string
-	ContractDocument         string
-	ContractEndDate          bigquery.NullTimestamp
-	ContractProbationEndDate bigquery.NullTimestamp
-	ContractProbationPeriod  int64
-	ContractStartDate        bigquery.NullTimestamp
-	ContractType             int64
-	ContractTypeDescription  string
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Department               string
-	DepartmentCode           string
-	DepartmentDescription    string
-	Division                 int64
-	Employee                 string
-	EmployeeFullName         string
-	EmployeeHID              int64
-	EmploymentOrganization   string
-	EndDate                  bigquery.NullTimestamp
-	HID                      int64
-	HourlyWage               float64
-	InternalRate             float64
-	Jobtitle                 string
-	JobtitleDescription      string
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	ReasonEnd                int64
-	ReasonEndDescription     string
-	ReasonEndFlex            int64
-	ReasonEndFlexDescription string
-	Salary                   string
-	Schedule                 string
-	ScheduleAverageHours     float64
-	ScheduleCode             string
-	ScheduleDays             float64
-	ScheduleDescription      string
-	ScheduleHours            float64
-	StartDate                bigquery.NullTimestamp
-	StartDateOrganization    bigquery.NullTimestamp
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	AverageDaysPerWeek         float64
+	AverageHoursPerWeek        float64
+	Contract                   string
+	ContractDocument           string
+	ContractEndDate            bigquery.NullTimestamp
+	ContractProbationEndDate   bigquery.NullTimestamp
+	ContractProbationPeriod    int64
+	ContractStartDate          bigquery.NullTimestamp
+	ContractType               int64
+	ContractTypeDescription    string
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Department                 string
+	DepartmentCode             string
+	DepartmentDescription      string
+	Division                   int64
+	Employee                   string
+	EmployeeFullName           string
+	EmployeeHID                int64
+	EmploymentOrganization     string
+	EndDate                    bigquery.NullTimestamp
+	HID                        int64
+	HourlyWage                 float64
+	InternalRate               float64
+	Jobtitle                   string
+	JobtitleDescription        string
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	ReasonEnd                  int64
+	ReasonEndDescription       string
+	ReasonEndFlex              int64
+	ReasonEndFlexDescription   string
+	Salary                     string
+	Schedule                   string
+	ScheduleAverageHours       float64
+	ScheduleCode               string
+	ScheduleDays               float64
+	ScheduleDescription        string
+	ScheduleHours              float64
+	StartDate                  bigquery.NullTimestamp
+	StartDateOrganization      bigquery.NullTimestamp
 }
 
-func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, softwareClientLicenceID int64) ActiveEmployment {
+func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ActiveEmployment {
 	t := time.Now()
 
 	return ActiveEmployment{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
 		c.AverageDaysPerWeek,
@@ -120,7 +122,7 @@ func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, soft
 	}
 }
 
-func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -155,7 +157,7 @@ func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandl
 		for _, tl := range *activeEmployments {
 			batchRowCount++
 
-			b, err := json.Marshal(getActiveEmployment(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getActiveEmployment(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

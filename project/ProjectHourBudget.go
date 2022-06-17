@@ -16,33 +16,35 @@ import (
 )
 
 type ProjectHourBudget struct {
-	OrganisationID_          int64
-	SoftwareClientLicenceID_ int64
-	Created_                 time.Time
-	Modified_                time.Time
-	ID                       string
-	Budget                   float64
-	Created                  bigquery.NullTimestamp
-	Creator                  string
-	CreatorFullName          string
-	Division                 int64
-	Item                     string
-	ItemCode                 string
-	ItemDescription          string
-	Modified                 bigquery.NullTimestamp
-	Modifier                 string
-	ModifierFullName         string
-	Project                  string
-	ProjectCode              string
-	ProjectDescription       string
+	OrganisationID_            int64
+	SoftwareClientLicenceID_   int64
+	SoftwareClientLicenseGuid_ string
+	Created_                   time.Time
+	Modified_                  time.Time
+	ID                         string
+	Budget                     float64
+	Created                    bigquery.NullTimestamp
+	Creator                    string
+	CreatorFullName            string
+	Division                   int64
+	Item                       string
+	ItemCode                   string
+	ItemDescription            string
+	Modified                   bigquery.NullTimestamp
+	Modifier                   string
+	ModifierFullName           string
+	Project                    string
+	ProjectCode                string
+	ProjectDescription         string
 }
 
-func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, softwareClientLicenceID int64) ProjectHourBudget {
+func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ProjectHourBudget {
 	t := time.Now()
 
 	return ProjectHourBudget{
 		organisationID,
 		softwareClientLicenceID,
+		softwareClientLicenseGuid,
 		t, t,
 		p.ID.String(),
 		p.Budget,
@@ -62,7 +64,7 @@ func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, so
 	}
 }
 
-func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -97,7 +99,7 @@ func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHand
 		for _, tl := range *projectHourBudgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getProjectHourBudget(&tl, organisationID, softwareClientLicenceID))
+			b, err := json.Marshal(getProjectHourBudget(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
