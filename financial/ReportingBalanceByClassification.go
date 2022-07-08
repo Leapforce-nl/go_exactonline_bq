@@ -14,8 +14,6 @@ import (
 )
 
 type ReportingBalanceByClassification struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -42,12 +40,10 @@ type ReportingBalanceByClassification struct {
 	Type                       int32
 }
 
-func getReportingBalanceByClassification(c *financial.ReportingBalanceByClassification, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ReportingBalanceByClassification {
+func getReportingBalanceByClassification(c *financial.ReportingBalanceByClassification, softwareClientLicenseGuid string) ReportingBalanceByClassification {
 	t := time.Now()
 
 	return ReportingBalanceByClassification{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID,
@@ -74,7 +70,7 @@ func getReportingBalanceByClassification(c *financial.ReportingBalanceByClassifi
 	}
 }
 
-func (service *Service) WriteReportingBalanceByClassifications(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReportingBalanceByClassifications(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -99,7 +95,7 @@ func (service *Service) WriteReportingBalanceByClassifications(bucketHandle *sto
 		// previous years
 		for {
 
-			_objectHandles, _rowCount, e := service.writeReportingBalanceByClassifications(bucketHandle, &scheme, year, organisationID, softwareClientLicenceID, softwareClientLicenseGuid)
+			_objectHandles, _rowCount, e := service.writeReportingBalanceByClassifications(bucketHandle, &scheme, year, softwareClientLicenseGuid)
 			if e != nil {
 				return nil, 0, nil, e
 			}
@@ -119,7 +115,7 @@ func (service *Service) WriteReportingBalanceByClassifications(bucketHandle *sto
 
 		// next years
 		for {
-			_objectHandles, _rowCount, e := service.writeReportingBalanceByClassifications(bucketHandle, &scheme, year, organisationID, softwareClientLicenceID, softwareClientLicenseGuid)
+			_objectHandles, _rowCount, e := service.writeReportingBalanceByClassifications(bucketHandle, &scheme, year, softwareClientLicenseGuid)
 			if e != nil {
 				return nil, 0, nil, e
 			}
@@ -140,7 +136,7 @@ func (service *Service) WriteReportingBalanceByClassifications(bucketHandle *sto
 	return objectHandles, rowCount, ReportingBalanceByClassification{}, nil
 }
 
-func (service *Service) writeReportingBalanceByClassifications(bucketHandle *storage.BucketHandle, scheme *financial.GLScheme, year int, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ([]*storage.ObjectHandle, int, *errortools.Error) {
+func (service *Service) writeReportingBalanceByClassifications(bucketHandle *storage.BucketHandle, scheme *financial.GLScheme, year int, softwareClientLicenseGuid string) ([]*storage.ObjectHandle, int, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil
 	}
@@ -176,7 +172,7 @@ func (service *Service) writeReportingBalanceByClassifications(bucketHandle *sto
 		for _, tl := range *reportingBalanceByClassifications {
 			batchRowCount++
 
-			b, err := json.Marshal(getReportingBalanceByClassification(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getReportingBalanceByClassification(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type ActiveEmployment struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -67,12 +65,10 @@ type ActiveEmployment struct {
 	StartDateOrganization      bigquery.NullTimestamp
 }
 
-func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ActiveEmployment {
+func getActiveEmployment(c *payroll.ActiveEmployment, softwareClientLicenseGuid string) ActiveEmployment {
 	t := time.Now()
 
 	return ActiveEmployment{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -122,7 +118,7 @@ func getActiveEmployment(c *payroll.ActiveEmployment, organisationID int64, soft
 	}
 }
 
-func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -157,7 +153,7 @@ func (service *Service) WriteActiveEmployments(bucketHandle *storage.BucketHandl
 		for _, tl := range *activeEmployments {
 			batchRowCount++
 
-			b, err := json.Marshal(getActiveEmployment(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getActiveEmployment(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

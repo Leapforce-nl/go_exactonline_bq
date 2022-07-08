@@ -16,8 +16,6 @@ import (
 )
 
 type StockCount struct {
-	OrganisationID_              int64
-	SoftwareClientLicenceID_     int64
 	SoftwareClientLicenseGuid_   string
 	Created_                     time.Time
 	Modified_                    time.Time
@@ -43,12 +41,10 @@ type StockCount struct {
 	WarehouseDescription         string
 }
 
-func getStockCount(c *inventory.StockCount, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) StockCount {
+func getStockCount(c *inventory.StockCount, softwareClientLicenseGuid string) StockCount {
 	t := time.Now()
 
 	return StockCount{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.StockCountID.String(),
@@ -75,7 +71,7 @@ func getStockCount(c *inventory.StockCount, organisationID int64, softwareClient
 	}
 }
 
-func (service *Service) WriteStockCounts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteStockCounts(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -110,7 +106,7 @@ func (service *Service) WriteStockCounts(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *stockCounts {
 			batchRowCount++
 
-			b, err := json.Marshal(getStockCount(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getStockCount(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

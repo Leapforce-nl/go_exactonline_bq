@@ -16,8 +16,6 @@ import (
 )
 
 type PurchaseEntryLine struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -72,12 +70,10 @@ type PurchaseEntryLine struct {
 	WithholdingTax             string
 }
 
-func getPurchaseEntryLine(c *purchaseentry.PurchaseEntryLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PurchaseEntryLine {
+func getPurchaseEntryLine(c *purchaseentry.PurchaseEntryLine, softwareClientLicenseGuid string) PurchaseEntryLine {
 	t := time.Now()
 
 	return PurchaseEntryLine{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -132,7 +128,7 @@ func getPurchaseEntryLine(c *purchaseentry.PurchaseEntryLine, organisationID int
 	}
 }
 
-func (service *Service) WritePurchaseEntryLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseEntryLines(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -167,7 +163,7 @@ func (service *Service) WritePurchaseEntryLines(bucketHandle *storage.BucketHand
 		for _, tl := range *purchaseEntryLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseEntryLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getPurchaseEntryLine(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type GLScheme struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -35,12 +33,10 @@ type GLScheme struct {
 	TargetNamespace            string
 }
 
-func getGLScheme(c *financial.GLScheme, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) GLScheme {
+func getGLScheme(c *financial.GLScheme, softwareClientLicenseGuid string) GLScheme {
 	t := time.Now()
 
 	return GLScheme{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -58,7 +54,7 @@ func getGLScheme(c *financial.GLScheme, organisationID int64, softwareClientLice
 	}
 }
 
-func (service *Service) WriteGLSchemes(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteGLSchemes(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -93,7 +89,7 @@ func (service *Service) WriteGLSchemes(bucketHandle *storage.BucketHandle, organ
 		for _, tl := range *glSchemes {
 			batchRowCount++
 
-			b, err := json.Marshal(getGLScheme(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getGLScheme(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

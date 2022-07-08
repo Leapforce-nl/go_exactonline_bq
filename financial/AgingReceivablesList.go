@@ -14,8 +14,6 @@ import (
 )
 
 type AgingReceivablesList struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -38,12 +36,10 @@ type AgingReceivablesList struct {
 	TotalAmount                float64
 }
 
-func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) AgingReceivablesList {
+func getAgingReceivablesList(c *financial.AgingReceivablesList, softwareClientLicenseGuid string) AgingReceivablesList {
 	t := time.Now()
 
 	return AgingReceivablesList{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.AccountID.String(),
@@ -66,7 +62,7 @@ func getAgingReceivablesList(c *financial.AgingReceivablesList, organisationID i
 	}
 }
 
-func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -101,7 +97,7 @@ func (service *Service) WriteAgingReceivablesLists(bucketHandle *storage.BucketH
 		for _, tl := range *agingReceivablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getAgingReceivablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getAgingReceivablesList(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

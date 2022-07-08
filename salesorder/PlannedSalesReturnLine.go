@@ -16,8 +16,6 @@ import (
 )
 
 type PlannedSalesReturnLine struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -51,12 +49,10 @@ type PlannedSalesReturnLine struct {
 	UnitDescription            string
 }
 
-func getPlannedSalesReturnLine(c *salesorder.PlannedSalesReturnLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PlannedSalesReturnLine {
+func getPlannedSalesReturnLine(c *salesorder.PlannedSalesReturnLine, softwareClientLicenseGuid string) PlannedSalesReturnLine {
 	t := time.Now()
 
 	return PlannedSalesReturnLine{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -90,7 +86,7 @@ func getPlannedSalesReturnLine(c *salesorder.PlannedSalesReturnLine, organisatio
 	}
 }
 
-func (service *Service) WritePlannedSalesReturnLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePlannedSalesReturnLines(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -125,7 +121,7 @@ func (service *Service) WritePlannedSalesReturnLines(bucketHandle *storage.Bucke
 		for _, tl := range *plannedSalesReturnLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getPlannedSalesReturnLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getPlannedSalesReturnLine(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

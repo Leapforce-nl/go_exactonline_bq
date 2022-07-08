@@ -14,8 +14,6 @@ import (
 )
 
 type AgingReceivablesListByAgeGroup struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -39,12 +37,10 @@ type AgingReceivablesListByAgeGroup struct {
 	TotalAmount                float64
 }
 
-func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGroup, ageGroup int, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) AgingReceivablesListByAgeGroup {
+func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGroup, ageGroup int, softwareClientLicenseGuid string) AgingReceivablesListByAgeGroup {
 	t := time.Now()
 
 	return AgingReceivablesListByAgeGroup{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		ageGroup,
@@ -68,7 +64,7 @@ func getAgingReceivablesListByAgeGroup(c *financial.AgingReceivablesListByAgeGro
 	}
 }
 
-func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -108,7 +104,7 @@ func (service *Service) WriteAgingReceivablesListByAgeGroups(bucketHandle *stora
 			for _, tl := range *agingReceivablesListByAgeGroups {
 				batchRowCount++
 
-				b, err := json.Marshal(getAgingReceivablesListByAgeGroup(&tl, ageGroup, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+				b, err := json.Marshal(getAgingReceivablesListByAgeGroup(&tl, ageGroup, softwareClientLicenseGuid))
 				if err != nil {
 					return nil, 0, nil, errortools.ErrorMessage(err)
 				}

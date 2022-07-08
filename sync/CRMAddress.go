@@ -15,8 +15,6 @@ import (
 )
 
 type CRMAddress struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -76,7 +74,7 @@ type CRMAddress struct {
 	WarehouseDescription       string
 }
 
-func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) CRMAddress {
+func getCRMAddress(c *sync.CRMAddress, softwareClientLicenseGuid string, maxTimestamp *int64) CRMAddress {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -85,8 +83,6 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 	t := time.Now()
 
 	return CRMAddress{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
@@ -146,7 +142,7 @@ func getCRMAddress(c *sync.CRMAddress, organisationID int64, softwareClientLicen
 	}
 }
 
-func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -183,7 +179,7 @@ func (service *Service) WriteCRMAddresss(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getCRMAddress(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getCRMAddress(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

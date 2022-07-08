@@ -15,8 +15,6 @@ import (
 )
 
 type FinancialGLAccount struct {
-	OrganisationID_                int64
-	SoftwareClientLicenceID_       int64
 	SoftwareClientLicenseGuid_     string
 	Created_                       time.Time
 	Modified_                      time.Time
@@ -63,7 +61,7 @@ type FinancialGLAccount struct {
 	YearEndReflectionGLAccount     string
 }
 
-func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialGLAccount {
+func getFinancialGLAccount(c *sync.FinancialGLAccount, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialGLAccount {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -72,8 +70,6 @@ func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, sof
 	t := time.Now()
 
 	return FinancialGLAccount{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.Timestamp.Value(),
@@ -120,7 +116,7 @@ func getFinancialGLAccount(c *sync.FinancialGLAccount, organisationID int64, sof
 	}
 }
 
-func (service *Service) WriteFinancialGLAccounts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteFinancialGLAccounts(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -157,7 +153,7 @@ func (service *Service) WriteFinancialGLAccounts(bucketHandle *storage.BucketHan
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getFinancialGLAccount(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getFinancialGLAccount(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

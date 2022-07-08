@@ -43,23 +43,23 @@ func NewService(exactonlineService *exactonline.Service) (*Service, *errortools.
 		return nil, nil
 	}
 
-	exactonlineBQService := Service{}
+	exactonlineBqService := Service{}
 
-	exactonlineBQService.AssetsService = assets.NewService(exactonlineService)
-	exactonlineBQService.BudgetService = budget.NewService(exactonlineService)
-	exactonlineBQService.CashflowService = cashflow.NewService(exactonlineService)
-	exactonlineBQService.CRMService = crm.NewService(exactonlineService)
-	exactonlineBQService.FinancialService = financial.NewService(exactonlineService)
-	exactonlineBQService.FinancialTransactionService = financialtransaction.NewService(exactonlineService)
-	exactonlineBQService.InventoryService = inventory.NewService(exactonlineService)
-	exactonlineBQService.LogisticsService = logistics.NewService(exactonlineService)
-	exactonlineBQService.PayrollService = payroll.NewService(exactonlineService)
-	exactonlineBQService.ProjectService = project.NewService(exactonlineService)
-	exactonlineBQService.PurchaseEntryService = purchaseentry.NewService(exactonlineService)
-	exactonlineBQService.PurchaseOrderService = purchaseorder.NewService(exactonlineService)
-	exactonlineBQService.SalesInvoiceService = salesinvoice.NewService(exactonlineService)
-	exactonlineBQService.SalesOrderService = salesorder.NewService(exactonlineService)
-	exactonlineBQService.SyncService = sync.NewService(exactonlineService)
+	exactonlineBqService.AssetsService = assets.NewService(exactonlineService)
+	exactonlineBqService.BudgetService = budget.NewService(exactonlineService)
+	exactonlineBqService.CashflowService = cashflow.NewService(exactonlineService)
+	exactonlineBqService.CRMService = crm.NewService(exactonlineService)
+	exactonlineBqService.FinancialService = financial.NewService(exactonlineService)
+	exactonlineBqService.FinancialTransactionService = financialtransaction.NewService(exactonlineService)
+	exactonlineBqService.InventoryService = inventory.NewService(exactonlineService)
+	exactonlineBqService.LogisticsService = logistics.NewService(exactonlineService)
+	exactonlineBqService.PayrollService = payroll.NewService(exactonlineService)
+	exactonlineBqService.ProjectService = project.NewService(exactonlineService)
+	exactonlineBqService.PurchaseEntryService = purchaseentry.NewService(exactonlineService)
+	exactonlineBqService.PurchaseOrderService = purchaseorder.NewService(exactonlineService)
+	exactonlineBqService.SalesInvoiceService = salesinvoice.NewService(exactonlineService)
+	exactonlineBqService.SalesOrderService = salesorder.NewService(exactonlineService)
+	exactonlineBqService.SyncService = sync.NewService(exactonlineService)
 
-	return &exactonlineBQService, nil
+	return &exactonlineBqService, nil
 }

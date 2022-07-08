@@ -16,8 +16,6 @@ import (
 )
 
 type Project struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -72,12 +70,10 @@ type Project struct {
 	UseBillingMilestones       bool
 }
 
-func getProject(c *project.Project, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Project {
+func getProject(c *project.Project, softwareClientLicenseGuid string) Project {
 	t := time.Now()
 
 	return Project{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -132,7 +128,7 @@ func getProject(c *project.Project, organisationID int64, softwareClientLicenceI
 	}
 }
 
-func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -167,7 +163,7 @@ func (service *Service) WriteProjects(bucketHandle *storage.BucketHandle, organi
 		for _, tl := range *projects {
 			batchRowCount++
 
-			b, err := json.Marshal(getProject(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getProject(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

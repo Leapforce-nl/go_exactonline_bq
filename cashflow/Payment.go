@@ -16,8 +16,6 @@ import (
 )
 
 type Payment struct {
-	OrganisationID_              int64
-	SoftwareClientLicenceID_     int64
 	SoftwareClientLicenseGuid_   string
 	Created_                     time.Time
 	Modified_                    time.Time
@@ -91,12 +89,10 @@ type Payment struct {
 	YourRef                      string
 }
 
-func getPayment(c *cashflow.Payment, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Payment {
+func getPayment(c *cashflow.Payment, softwareClientLicenseGuid string) Payment {
 	t := time.Now()
 
 	return Payment{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -170,7 +166,7 @@ func getPayment(c *cashflow.Payment, organisationID int64, softwareClientLicence
 	}
 }
 
-func (service *Service) WritePaymentsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePaymentsBQ(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -205,7 +201,7 @@ func (service *Service) WritePaymentsBQ(bucketHandle *storage.BucketHandle, orga
 		for _, tl := range *payments {
 			batchRowCount++
 
-			b, err := json.Marshal(getPayment(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getPayment(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type PayablesList struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -40,12 +38,10 @@ type PayablesList struct {
 	YourRef                    string
 }
 
-func getPayablesList(c *financial.PayablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PayablesList {
+func getPayablesList(c *financial.PayablesList, softwareClientLicenseGuid string) PayablesList {
 	t := time.Now()
 
 	return PayablesList{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.HID,
@@ -68,7 +64,7 @@ func getPayablesList(c *financial.PayablesList, organisationID int64, softwareCl
 	}
 }
 
-func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -104,7 +100,7 @@ func (service *Service) WritePayablesLists(bucketHandle *storage.BucketHandle, o
 		for _, tl := range *payablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getPayablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getPayablesList(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

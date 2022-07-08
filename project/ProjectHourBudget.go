@@ -16,8 +16,6 @@ import (
 )
 
 type ProjectHourBudget struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -38,12 +36,10 @@ type ProjectHourBudget struct {
 	ProjectDescription         string
 }
 
-func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ProjectHourBudget {
+func getProjectHourBudget(p *project.ProjectHourBudget, softwareClientLicenseGuid string) ProjectHourBudget {
 	t := time.Now()
 
 	return ProjectHourBudget{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		p.ID.String(),
@@ -64,7 +60,7 @@ func getProjectHourBudget(p *project.ProjectHourBudget, organisationID int64, so
 	}
 }
 
-func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -99,7 +95,7 @@ func (service *Service) WriteProjectHourBudgets(bucketHandle *storage.BucketHand
 		for _, tl := range *projectHourBudgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getProjectHourBudget(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getProjectHourBudget(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

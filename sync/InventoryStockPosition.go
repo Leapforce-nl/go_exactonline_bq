@@ -13,8 +13,6 @@ import (
 )
 
 type InventoryStockPosition struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -38,7 +36,7 @@ type InventoryStockPosition struct {
 	WarehouseDescription       string
 }
 
-func getInventoryStockPosition(c *sync.InventoryStockPosition, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) InventoryStockPosition {
+func getInventoryStockPosition(c *sync.InventoryStockPosition, softwareClientLicenseGuid string, maxTimestamp *int64) InventoryStockPosition {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -47,8 +45,6 @@ func getInventoryStockPosition(c *sync.InventoryStockPosition, organisationID in
 	t := time.Now()
 
 	return InventoryStockPosition{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
@@ -72,7 +68,7 @@ func getInventoryStockPosition(c *sync.InventoryStockPosition, organisationID in
 	}
 }
 
-func (service *Service) WriteInventoryStockPositions(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteInventoryStockPositions(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -109,7 +105,7 @@ func (service *Service) WriteInventoryStockPositions(bucketHandle *storage.Bucke
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getInventoryStockPosition(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getInventoryStockPosition(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

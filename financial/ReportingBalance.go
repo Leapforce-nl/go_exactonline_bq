@@ -14,8 +14,6 @@ import (
 )
 
 type ReportingBalance struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -39,12 +37,10 @@ type ReportingBalance struct {
 	Type                       int32
 }
 
-func getReportingBalance(c *financial.ReportingBalance, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ReportingBalance {
+func getReportingBalance(c *financial.ReportingBalance, softwareClientLicenseGuid string) ReportingBalance {
 	t := time.Now()
 
 	return ReportingBalance{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID,
@@ -68,7 +64,7 @@ func getReportingBalance(c *financial.ReportingBalance, organisationID int64, so
 	}
 }
 
-func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -103,7 +99,7 @@ func (service *Service) WriteReportingBalances(bucketHandle *storage.BucketHandl
 		for _, tl := range *reportingBalances {
 			batchRowCount++
 
-			b, err := json.Marshal(getReportingBalance(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getReportingBalance(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

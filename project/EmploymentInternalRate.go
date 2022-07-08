@@ -16,8 +16,6 @@ import (
 )
 
 type EmploymentInternalRate struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -39,12 +37,10 @@ type EmploymentInternalRate struct {
 	StartDate                  bigquery.NullTimestamp
 }
 
-func getEmploymentInternalRate(c *project.EmploymentInternalRate, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) EmploymentInternalRate {
+func getEmploymentInternalRate(c *project.EmploymentInternalRate, softwareClientLicenseGuid string) EmploymentInternalRate {
 	t := time.Now()
 
 	return EmploymentInternalRate{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -66,7 +62,7 @@ func getEmploymentInternalRate(c *project.EmploymentInternalRate, organisationID
 	}
 }
 
-func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -101,7 +97,7 @@ func (service *Service) WriteEmploymentInternalRates(bucketHandle *storage.Bucke
 		for _, tl := range *employmentInternalRates {
 			batchRowCount++
 
-			b, err := json.Marshal(getEmploymentInternalRate(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getEmploymentInternalRate(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type PurchaseReturnLine struct {
-	OrganisationID_             int64
-	SoftwareClientLicenceID_    int64
 	SoftwareClientLicenseGuid_  string
 	Created_                    time.Time
 	Modified_                   time.Time
@@ -51,12 +49,10 @@ type PurchaseReturnLine struct {
 	UnitCode                    string
 }
 
-func getPurchaseReturnLine(c *purchaseorder.PurchaseReturnLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) PurchaseReturnLine {
+func getPurchaseReturnLine(c *purchaseorder.PurchaseReturnLine, softwareClientLicenseGuid string) PurchaseReturnLine {
 	t := time.Now()
 
 	return PurchaseReturnLine{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -90,7 +86,7 @@ func getPurchaseReturnLine(c *purchaseorder.PurchaseReturnLine, organisationID i
 	}
 }
 
-func (service *Service) WritePurchaseReturnLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WritePurchaseReturnLines(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -125,7 +121,7 @@ func (service *Service) WritePurchaseReturnLines(bucketHandle *storage.BucketHan
 		for _, tl := range *purchaseReturnLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getPurchaseReturnLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getPurchaseReturnLine(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type ReceivablesList struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -39,12 +37,10 @@ type ReceivablesList struct {
 	YourRef                    string
 }
 
-func getReceivablesList(c *financial.ReceivablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) ReceivablesList {
+func getReceivablesList(c *financial.ReceivablesList, softwareClientLicenseGuid string) ReceivablesList {
 	t := time.Now()
 
 	return ReceivablesList{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.HID,
@@ -66,7 +62,7 @@ func getReceivablesList(c *financial.ReceivablesList, organisationID int64, soft
 	}
 }
 
-func (service *Service) WriteReceivablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteReceivablesLists(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -101,7 +97,7 @@ func (service *Service) WriteReceivablesLists(bucketHandle *storage.BucketHandle
 		for _, tl := range *receivablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getReceivablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getReceivablesList(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

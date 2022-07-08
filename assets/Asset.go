@@ -16,8 +16,6 @@ import (
 )
 
 type Asset struct {
-	OrganisationID_               int64
-	SoftwareClientLicenceID_      int64
 	SoftwareClientLicenseGuid_    string
 	Created_                      time.Time
 	Modified_                     time.Time
@@ -76,12 +74,10 @@ type Asset struct {
 	TransactionEntryNo       int32
 }
 
-func getAsset(c *assets.Asset, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Asset {
+func getAsset(c *assets.Asset, softwareClientLicenseGuid string) Asset {
 	t := time.Now()
 
 	return Asset{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -140,7 +136,7 @@ func getAsset(c *assets.Asset, organisationID int64, softwareClientLicenceID int
 	}
 }
 
-func (service *Service) WriteAssetsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAssetsBQ(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -175,7 +171,7 @@ func (service *Service) WriteAssetsBQ(bucketHandle *storage.BucketHandle, organi
 		for _, tl := range *assets {
 			batchRowCount++
 
-			b, err := json.Marshal(getAsset(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getAsset(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

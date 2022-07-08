@@ -16,8 +16,6 @@ import (
 )
 
 type TimeTransaction struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -67,12 +65,10 @@ type TimeTransaction struct {
 	Type                       int64
 }
 
-func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) TimeTransaction {
+func getTimeTransaction(c *project.TimeTransaction, softwareClientLicenseGuid string) TimeTransaction {
 	t := time.Now()
 
 	return TimeTransaction{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -122,7 +118,7 @@ func getTimeTransaction(c *project.TimeTransaction, organisationID int64, softwa
 	}
 }
 
-func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -157,7 +153,7 @@ func (service *Service) WriteTimeTransactions(bucketHandle *storage.BucketHandle
 		for _, tl := range *timeTransactions {
 			batchRowCount++
 
-			b, err := json.Marshal(getTimeTransaction(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getTimeTransaction(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

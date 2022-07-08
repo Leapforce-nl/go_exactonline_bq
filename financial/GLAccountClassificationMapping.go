@@ -14,8 +14,6 @@ import (
 )
 
 type GLAccountClassificationMapping struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -32,12 +30,10 @@ type GLAccountClassificationMapping struct {
 	GLSchemeID                 string
 }
 
-func getGLAccountClassificationMapping(c *financial.GLAccountClassificationMapping, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) GLAccountClassificationMapping {
+func getGLAccountClassificationMapping(c *financial.GLAccountClassificationMapping, softwareClientLicenseGuid string) GLAccountClassificationMapping {
 	t := time.Now()
 
 	return GLAccountClassificationMapping{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -54,7 +50,7 @@ func getGLAccountClassificationMapping(c *financial.GLAccountClassificationMappi
 	}
 }
 
-func (service *Service) WriteGLAccountClassificationMappings(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteGLAccountClassificationMappings(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -89,7 +85,7 @@ func (service *Service) WriteGLAccountClassificationMappings(bucketHandle *stora
 		for _, tl := range *glAccountClassificationMappings {
 			batchRowCount++
 
-			b, err := json.Marshal(getGLAccountClassificationMapping(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getGLAccountClassificationMapping(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

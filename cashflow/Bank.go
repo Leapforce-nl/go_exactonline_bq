@@ -16,8 +16,6 @@ import (
 )
 
 type Bank struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -33,12 +31,10 @@ type Bank struct {
 	Status                     string
 }
 
-func getBank(c *cashflow.Bank, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Bank {
+func getBank(c *cashflow.Bank, softwareClientLicenseGuid string) Bank {
 	t := time.Now()
 
 	return Bank{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -54,7 +50,7 @@ func getBank(c *cashflow.Bank, organisationID int64, softwareClientLicenceID int
 	}
 }
 
-func (service *Service) WriteBanksBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBanksBQ(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -89,7 +85,7 @@ func (service *Service) WriteBanksBQ(bucketHandle *storage.BucketHandle, organis
 		for _, tl := range *banks {
 			batchRowCount++
 
-			b, err := json.Marshal(getBank(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getBank(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

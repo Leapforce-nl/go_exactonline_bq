@@ -15,8 +15,6 @@ import (
 )
 
 type SalesOrderSalesOrder struct {
-	OrganisationID_                int64
-	SoftwareClientLicenceID_       int64
 	SoftwareClientLicenseGuid_     string
 	Created_                       time.Time
 	Modified_                      time.Time
@@ -123,7 +121,7 @@ type SalesOrderSalesOrder struct {
 	YourRef                        string
 }
 
-func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrder {
+func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrder {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -132,8 +130,6 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 	t := time.Now()
 
 	return SalesOrderSalesOrder{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
@@ -240,7 +236,7 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, organisationID int64,
 	}
 }
 
-func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -277,7 +273,7 @@ func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketH
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesOrderSalesOrder(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getSalesOrderSalesOrder(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

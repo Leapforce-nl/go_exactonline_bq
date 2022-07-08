@@ -14,8 +14,6 @@ import (
 )
 
 type AgingPayablesList struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -38,12 +36,10 @@ type AgingPayablesList struct {
 	TotalAmount                float64
 }
 
-func getAgingPayablesList(c *financial.AgingPayablesList, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) AgingPayablesList {
+func getAgingPayablesList(c *financial.AgingPayablesList, softwareClientLicenseGuid string) AgingPayablesList {
 	t := time.Now()
 
 	return AgingPayablesList{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.AccountId.String(),
@@ -66,7 +62,7 @@ func getAgingPayablesList(c *financial.AgingPayablesList, organisationID int64, 
 	}
 }
 
-func (service *Service) WriteAgingPayablesLists(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteAgingPayablesLists(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, _ *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -101,7 +97,7 @@ func (service *Service) WriteAgingPayablesLists(bucketHandle *storage.BucketHand
 		for _, tl := range *agingPayablesLists {
 			batchRowCount++
 
-			b, err := json.Marshal(getAgingPayablesList(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getAgingPayablesList(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

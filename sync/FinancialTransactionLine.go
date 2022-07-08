@@ -15,8 +15,6 @@ import (
 )
 
 type FinancialTransactionLine struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -91,7 +89,7 @@ type FinancialTransactionLine struct {
 	YourRef                    string
 }
 
-func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialTransactionLine {
+func getFinancialTransactionLine(c *sync.FinancialTransactionLine, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialTransactionLine {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -100,8 +98,6 @@ func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationI
 	t := time.Now()
 
 	return FinancialTransactionLine{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.Timestamp.Value(),
@@ -176,7 +172,7 @@ func getFinancialTransactionLine(c *sync.FinancialTransactionLine, organisationI
 	}
 }
 
-func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -213,7 +209,7 @@ func (service *Service) WriteFinancialTransactionLines(bucketHandle *storage.Buc
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getFinancialTransactionLine(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getFinancialTransactionLine(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

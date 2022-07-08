@@ -15,8 +15,6 @@ import (
 )
 
 type FinancialGLClassification struct {
-	OrganisationID_              int64
-	SoftwareClientLicenceID_     int64
 	SoftwareClientLicenseGuid_   string
 	Created_                     time.Time
 	Modified_                    time.Time
@@ -44,7 +42,7 @@ type FinancialGLClassification struct {
 	Type                         string
 }
 
-func getFinancialGLClassification(c *sync.FinancialGLClassification, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialGLClassification {
+func getFinancialGLClassification(c *sync.FinancialGLClassification, softwareClientLicenseGuid string, maxTimestamp *int64) FinancialGLClassification {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -53,8 +51,6 @@ func getFinancialGLClassification(c *sync.FinancialGLClassification, organisatio
 	t := time.Now()
 
 	return FinancialGLClassification{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.Timestamp.Value(),
@@ -82,7 +78,7 @@ func getFinancialGLClassification(c *sync.FinancialGLClassification, organisatio
 	}
 }
 
-func (service *Service) WriteFinancialGLClassifications(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteFinancialGLClassifications(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -119,7 +115,7 @@ func (service *Service) WriteFinancialGLClassifications(bucketHandle *storage.Bu
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getFinancialGLClassification(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getFinancialGLClassification(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

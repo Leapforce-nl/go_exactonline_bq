@@ -16,8 +16,6 @@ import (
 )
 
 type Budget struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -48,12 +46,10 @@ type Budget struct {
 	ReportingYear              int16
 }
 
-func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) Budget {
+func getBudget(c *budget.Budget, softwareClientLicenseGuid string) Budget {
 	t := time.Now()
 
 	return Budget{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -84,7 +80,7 @@ func getBudget(c *budget.Budget, organisationID int64, softwareClientLicenceID i
 	}
 }
 
-func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -119,7 +115,7 @@ func (service *Service) WriteBudgetsBQ(bucketHandle *storage.BucketHandle, organ
 		for _, tl := range *budgets {
 			batchRowCount++
 
-			b, err := json.Marshal(getBudget(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getBudget(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

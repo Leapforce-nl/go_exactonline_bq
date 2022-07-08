@@ -15,8 +15,6 @@ import (
 )
 
 type CRMContact struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -89,7 +87,7 @@ type CRMContact struct {
 	Title                      string
 }
 
-func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) CRMContact {
+func getCRMContact(c *sync.CRMContact, softwareClientLicenseGuid string, maxTimestamp *int64) CRMContact {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -98,8 +96,6 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 	t := time.Now()
 
 	return CRMContact{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
@@ -172,7 +168,7 @@ func getCRMContact(c *sync.CRMContact, organisationID int64, softwareClientLicen
 	}
 }
 
-func (service *Service) WriteCRMContacts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteCRMContacts(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -209,7 +205,7 @@ func (service *Service) WriteCRMContacts(bucketHandle *storage.BucketHandle, org
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getCRMContact(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getCRMContact(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

@@ -15,8 +15,6 @@ import (
 )
 
 type LogisticsItem struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -121,7 +119,7 @@ type LogisticsItem struct {
 	UnitType                   string
 }
 
-func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, maxTimestamp *int64) LogisticsItem {
+func getLogisticsItem(c *sync.LogisticsItem, softwareClientLicenseGuid string, maxTimestamp *int64) LogisticsItem {
 	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
@@ -130,8 +128,6 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 	t := time.Now()
 
 	return LogisticsItem{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		timestamp,
@@ -236,7 +232,7 @@ func getLogisticsItem(c *sync.LogisticsItem, organisationID int64, softwareClien
 	}
 }
 
-func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -273,7 +269,7 @@ func (service *Service) WriteLogisticsItems(bucketHandle *storage.BucketHandle, 
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getLogisticsItem(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getLogisticsItem(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}

@@ -16,8 +16,6 @@ import (
 )
 
 type EmploymentContract struct {
-	OrganisationID_              int64
-	SoftwareClientLicenceID_     int64
 	SoftwareClientLicenseGuid_   string
 	Created_                     time.Time
 	Modified_                    time.Time
@@ -51,12 +49,10 @@ type EmploymentContract struct {
 	TypeDescription              string
 }
 
-func getEmploymentContract(c *payroll.EmploymentContract, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) EmploymentContract {
+func getEmploymentContract(c *payroll.EmploymentContract, softwareClientLicenseGuid string) EmploymentContract {
 	t := time.Now()
 
 	return EmploymentContract{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t,
 		t,
@@ -91,7 +87,7 @@ func getEmploymentContract(c *payroll.EmploymentContract, organisationID int64, 
 	}
 }
 
-func (service *Service) WriteEmploymentContracts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteEmploymentContracts(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -126,7 +122,7 @@ func (service *Service) WriteEmploymentContracts(bucketHandle *storage.BucketHan
 		for _, tl := range *employmentContracts {
 			batchRowCount++
 
-			b, err := json.Marshal(getEmploymentContract(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getEmploymentContract(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}

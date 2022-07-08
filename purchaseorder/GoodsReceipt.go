@@ -15,8 +15,6 @@ import (
 )
 
 type GoodsReceipt struct {
-	OrganisationID_            int64
-	SoftwareClientLicenceID_   int64
 	SoftwareClientLicenseGuid_ string
 	Created_                   time.Time
 	Modified_                  time.Time
@@ -47,12 +45,10 @@ type GoodsReceipt struct {
 	YourRef                    string
 }
 
-func getGoodsReceipt(c *purchaseorder.GoodsReceipt, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string) GoodsReceipt {
+func getGoodsReceipt(c *purchaseorder.GoodsReceipt, softwareClientLicenseGuid string) GoodsReceipt {
 	t := time.Now()
 
 	return GoodsReceipt{
-		organisationID,
-		softwareClientLicenceID,
 		softwareClientLicenseGuid,
 		t, t,
 		c.ID.String(),
@@ -83,7 +79,7 @@ func getGoodsReceipt(c *purchaseorder.GoodsReceipt, organisationID int64, softwa
 	}
 }
 
-func (service *Service) WriteGoodsReceipts(bucketHandle *storage.BucketHandle, organisationID int64, softwareClientLicenceID int64, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
+func (service *Service) WriteGoodsReceipts(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, lastModified *time.Time) ([]*storage.ObjectHandle, int, interface{}, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, 0, nil, nil
 	}
@@ -118,7 +114,7 @@ func (service *Service) WriteGoodsReceipts(bucketHandle *storage.BucketHandle, o
 		for _, tl := range *goodsReceipts {
 			batchRowCount++
 
-			b, err := json.Marshal(getGoodsReceipt(&tl, organisationID, softwareClientLicenceID, softwareClientLicenseGuid))
+			b, err := json.Marshal(getGoodsReceipt(&tl, softwareClientLicenseGuid))
 			if err != nil {
 				return nil, 0, nil, errortools.ErrorMessage(err)
 			}
