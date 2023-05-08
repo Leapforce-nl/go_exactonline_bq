@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.51.1
 	cloud.google.com/go/storage v1.30.1
 	github.com/leapforce-libraries/go_errortools v0.0.0-20230306211452-9ccee0cdafe8
-	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508142102-d08f626cd94e
+	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508150017-f139c0202514
 	github.com/leapforce-libraries/go_google v0.0.0-20230207215141-4e03131236a9
 	github.com/leapforce-libraries/go_types v0.0.0-20230425074203-34c9cae0aa4e
 )

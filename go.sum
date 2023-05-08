@@ -103,8 +103,8 @@ github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBF
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/leapforce-libraries/go_errortools v0.0.0-20230306211452-9ccee0cdafe8 h1:mk7IsGbGLmnskY2uF4Vhsndnvv/yEtXW4kf8mgv39EQ=
 github.com/leapforce-libraries/go_errortools v0.0.0-20230306211452-9ccee0cdafe8/go.mod h1:Dohd/6JCzEyLpngEdzbDKZ54gu2n0lKd0dsV8BgjczU=
-github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508142102-d08f626cd94e h1:KAVflLJ9GmpAtncdvnJQuSq6QBKS2VZe1/zKhH2b/28=
-github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508142102-d08f626cd94e/go.mod h1:aDR/Gv1JZ6p1So+sR68JO5oTl8EfN3kPlyd04oLhPi4=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508150017-f139c0202514 h1:Twe7R7sG16DH5hTfJIqOEO+hQRuJoLIA8jVp3O6YvOY=
+github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508150017-f139c0202514/go.mod h1:aDR/Gv1JZ6p1So+sR68JO5oTl8EfN3kPlyd04oLhPi4=
 github.com/leapforce-libraries/go_google v0.0.0-20230207215141-4e03131236a9 h1:THDzJhIHNzmbof522JSMIfkbRbNQpiXiOWAdE9APKmM=
 github.com/leapforce-libraries/go_google v0.0.0-20230207215141-4e03131236a9/go.mod h1:wdoLHDn78Ahy5Wzu9z/2CPvOIL/ns/Iy+7yhOdpkM/g=
 github.com/leapforce-libraries/go_googlecloudstorage v0.0.0-20220613120507-258e984f5c4f h1:3QjiFf4DSZZBCZ9oiMF/9+haPWIuSnyj4q/8RbwHIQA=

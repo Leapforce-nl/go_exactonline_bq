@@ -80,17 +80,17 @@ type SalesOrderSalesOrderLine struct {
 }
 
 func getSalesOrderSalesOrderLine(c *sync.SalesOrderSalesOrderLine, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrderLine {
-	/*timestamp := c.Timestamp.Value()
+	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
-	}*/
+	}
 
 	t := time.Now()
 
 	return SalesOrderSalesOrderLine{
 		softwareClientLicenseGuid,
 		t, t,
-		c.Timestamp,
+		timestamp,
 		c.AmountDc,
 		c.AmountFc,
 		c.CostCenter,

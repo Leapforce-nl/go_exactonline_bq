@@ -98,17 +98,17 @@ type SalesOrderSalesOrderHeader struct {
 }
 
 func getSalesOrderSalesOrderHeader(c *sync.SalesOrderSalesOrderHeader, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrderHeader {
-	/*timestamp := c.Timestamp.Value()
+	timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
-	}*/
+	}
 
 	t := time.Now()
 
 	return SalesOrderSalesOrderHeader{
 		softwareClientLicenseGuid,
 		t, t,
-		c.Timestamp,
+		timestamp,
 		c.AmountDc,
 		c.AmountDiscount,
 		c.AmountDiscountExclVat,
