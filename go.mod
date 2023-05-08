@@ -3,12 +3,12 @@ module github.com/leapforce-libraries/go_exactonline_bq
 go 1.20
 
 require (
-	cloud.google.com/go/bigquery v1.51.0
+	cloud.google.com/go/bigquery v1.51.1
 	cloud.google.com/go/storage v1.30.1
 	github.com/leapforce-libraries/go_errortools v0.0.0-20230306211452-9ccee0cdafe8
-	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230418155133-785debc12e0e
+	github.com/leapforce-libraries/go_exactonline_new v0.0.0-20230508142102-d08f626cd94e
 	github.com/leapforce-libraries/go_google v0.0.0-20230207215141-4e03131236a9
-	github.com/leapforce-libraries/go_types v0.0.0-20230209235725-e0c0b0948f2b
+	github.com/leapforce-libraries/go_types v0.0.0-20230425074203-34c9cae0aa4e
 )
 
 require (
@@ -17,25 +17,26 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/apache/arrow/go/v11 v11.0.0 // indirect
+	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/getsentry/sentry-go v0.19.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
-	github.com/gofrs/uuid v4.3.1+incompatible // indirect
-	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/s2a-go v0.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
-	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
+	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/klauspost/asmfmt v1.3.2 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/leapforce-libraries/go_googlecloudstorage v0.0.0-20220613120507-258e984f5c4f // indirect
-	github.com/leapforce-libraries/go_http v0.0.0-20220808204824-8a0e0bdcdfd1 // indirect
-	github.com/leapforce-libraries/go_integration v0.0.0-20220801142518-7b4fe1b429bb // indirect
+	github.com/leapforce-libraries/go_http v0.0.0-20230420114702-86cc77fcf983 // indirect
+	github.com/leapforce-libraries/go_integration v0.0.0-20221219180324-1d9ce9d12c4c // indirect
 	github.com/leapforce-libraries/go_oauth2 v0.0.0-20221214115901-39922a58efbf // indirect
 	github.com/leapforce-libraries/go_utilities v0.0.0-20230320164646-a793abe241b2 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
@@ -43,17 +44,18 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/oauth2 v0.6.0 // indirect
+	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/text v0.8.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.114.0 // indirect
+	google.golang.org/api v0.118.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230330154414-c0448cd141ea // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )

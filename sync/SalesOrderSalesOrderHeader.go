@@ -14,7 +14,7 @@ import (
 	types "github.com/leapforce-libraries/go_types"
 )
 
-type SalesOrderSalesOrder struct {
+type SalesOrderSalesOrderHeader struct {
 	SoftwareClientLicenseGuid_     string
 	Created_                       time.Time
 	Modified_                      time.Time
@@ -29,16 +29,10 @@ type SalesOrderSalesOrder struct {
 	Approved                       bigquery.NullTimestamp
 	Approver                       string
 	ApproverFullName               string
-	CostCenter                     string  `json:"CostCenter"`
-	CostCenterDescription          string  `json:"CostCenterDescription"`
-	CostPriceFC                    float64 `json:"CostPriceFC"`
-	CostUnit                       string  `json:"CostUnit"`
-	CostUnitDescription            string  `json:"CostUnitDescription"`
 	Created                        bigquery.NullTimestamp
 	Creator                        string
 	CreatorFullName                string
 	Currency                       string
-	CustomerItemCode               string `json:"CustomerItemCode"`
 	DeliverTo                      string
 	DeliverToContactPerson         string
 	DeliverToContactPersonFullName string
@@ -54,23 +48,18 @@ type SalesOrderSalesOrder struct {
 	DocumentNumber                 int32
 	DocumentSubject                string
 	ID                             string
+	IncotermAddress                string
+	IncotermCode                   string
+	IncotermVersion                int16
 	InvoiceStatus                  int16
 	InvoiceStatusDescription       string
 	InvoiceTo                      string
 	InvoiceToContactPerson         string
 	InvoiceToContactPersonFullName string
 	InvoiceToName                  string
-	Item                           string
-	ItemCode                       string
-	ItemDescription                string
-	ItemVersion                    string
-	ItemVersionDescription         string
-	LineNumber                     int32
-	Margin                         float64
 	Modified                       bigquery.NullTimestamp
 	Modifier                       string
 	ModifierFullName               string
-	NetPrice                       float64
 	Notes                          string
 	OrderDate                      bigquery.NullTimestamp
 	OrderedBy                      string
@@ -82,77 +71,58 @@ type SalesOrderSalesOrder struct {
 	PaymentCondition               string
 	PaymentConditionDescription    string
 	PaymentReference               string
-	Pricelist                      string
-	PricelistDescription           string
 	Project                        string
+	ProjectCode                    string
 	ProjectDescription             string
-	PurchaseOrder                  string
-	PurchaseOrderLine              string
-	PurchaseOrderLineNumber        int32
-	PurchaseOrderNumber            int32
-	Quantity                       float64
-	QuantityDelivered              float64
-	QuantityInvoiced               float64
 	Remarks                        string
-	SalesPerson                    string
-	SalesPersonFullName            string
+	SalesChannel                   string
+	SalesChannelCode               string
+	SalesChannelDescription        string
+	Salesperson                    string
+	SalespersonFullName            string
 	SelectionCode                  string
 	SelectionCodeCode              string
 	SelectionCodeDescription       string
 	ShippingMethod                 string
+	ShippingMethodCode             string
 	ShippingMethodDescription      string
-	ShopOrder                      string
 	Status                         int16
 	StatusDescription              string
-	TaxSchedule                    string
-	TaxScheduleCode                string
-	TaxScheduleDescription         string
-	UnitCode                       string
-	UnitDescription                string
-	UnitPrice                      float64
-	UseDropShipment                byte
 	VATAmount                      float64
 	VATCode                        string
 	VATCodeDescription             string
-	VATPercentage                  float64
 	WarehouseCode                  string
 	WarehouseDescription           string
 	WarehouseID                    string
 	YourRef                        string
 }
 
-func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrder {
-	timestamp := c.Timestamp.Value()
+func getSalesOrderSalesOrderHeader(c *sync.SalesOrderSalesOrderHeader, softwareClientLicenseGuid string, maxTimestamp *int64) SalesOrderSalesOrderHeader {
+	/*timestamp := c.Timestamp.Value()
 	if timestamp > *maxTimestamp {
 		*maxTimestamp = timestamp
-	}
+	}*/
 
 	t := time.Now()
 
-	return SalesOrderSalesOrder{
+	return SalesOrderSalesOrderHeader{
 		softwareClientLicenseGuid,
 		t, t,
-		timestamp,
-		c.AmountDC,
+		c.Timestamp,
+		c.AmountDc,
 		c.AmountDiscount,
 		c.AmountDiscountExclVat,
-		c.AmountFC,
-		c.AmountFCExclVat,
+		c.AmountFc,
+		c.AmountFcExclVat,
 		c.ApprovalStatus,
 		c.ApprovalStatusDescription,
 		go_bigquery.DateToNullTimestamp(c.Approved),
 		c.Approver.String(),
 		c.ApproverFullName,
-		c.CostCenter,
-		c.CostCenterDescription,
-		c.CostPriceFC,
-		c.CostUnit,
-		c.CostUnitDescription,
 		go_bigquery.DateToNullTimestamp(c.Created),
 		c.Creator.String(),
 		c.CreatorFullName,
 		c.Currency,
-		c.CustomerItemCode,
 		c.DeliverTo.String(),
 		c.DeliverToContactPerson.String(),
 		c.DeliverToContactPersonFullName,
@@ -167,76 +137,58 @@ func getSalesOrderSalesOrder(c *sync.SalesOrderSalesOrder, softwareClientLicense
 		c.Document.String(),
 		c.DocumentNumber,
 		c.DocumentSubject,
-		c.ID.String(),
+		c.Id.String(),
+		c.IncotermAddress,
+		c.IncotermCode,
+		c.IncotermVersion,
 		c.InvoiceStatus,
 		c.InvoiceStatusDescription,
 		c.InvoiceTo.String(),
 		c.InvoiceToContactPerson.String(),
 		c.InvoiceToContactPersonFullName,
 		c.InvoiceToName,
-		c.Item.String(),
-		c.ItemCode,
-		c.ItemDescription,
-		c.ItemVersion.String(),
-		c.ItemVersionDescription,
-		c.LineNumber,
-		c.Margin,
 		go_bigquery.DateToNullTimestamp(c.Modified),
 		c.Modifier.String(),
 		c.ModifierFullName,
-		c.NetPrice,
 		c.Notes,
 		go_bigquery.DateToNullTimestamp(c.OrderDate),
 		c.OrderedBy.String(),
 		c.OrderedByContactPerson.String(),
 		c.OrderedByContactPersonFullName,
 		c.OrderedByName,
-		c.OrderID.String(),
+		c.OrderId.String(),
 		c.OrderNumber,
 		c.PaymentCondition,
 		c.PaymentConditionDescription,
 		c.PaymentReference,
-		c.Pricelist.String(),
-		c.PricelistDescription,
 		c.Project.String(),
+		c.ProjectCode,
 		c.ProjectDescription,
-		c.PurchaseOrder.String(),
-		c.PurchaseOrderLine.String(),
-		c.PurchaseOrderLineNumber,
-		c.PurchaseOrderNumber,
-		c.Quantity,
-		c.QuantityDelivered,
-		c.QuantityInvoiced,
 		c.Remarks,
-		c.SalesPerson.String(),
-		c.SalesPersonFullName,
+		c.SalesChannel.String(),
+		c.SalesChannelCode,
+		c.SalesChannelDescription,
+		c.Salesperson.String(),
+		c.SalespersonFullName,
 		c.SelectionCode.String(),
 		c.SelectionCodeCode,
 		c.SelectionCodeDescription,
 		c.ShippingMethod.String(),
+		c.ShippingMethodCode,
 		c.ShippingMethodDescription,
-		c.ShopOrder.String(),
 		c.Status,
 		c.StatusDescription,
-		c.TaxSchedule.String(),
-		c.TaxScheduleCode,
-		c.TaxScheduleDescription,
-		c.UnitCode,
-		c.UnitDescription,
-		c.UnitPrice,
-		c.UseDropShipment,
-		c.VATAmount,
-		c.VATCode,
-		c.VATCodeDescription,
-		c.VATPercentage,
+		c.VatAmount,
+		c.VatCode,
+		c.VatCodeDescription,
 		c.WarehouseCode,
 		c.WarehouseDescription,
-		c.WarehouseID.String(),
+		c.WarehouseId.String(),
 		c.YourRef,
 	}
 }
 
-func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
+func (service *Service) WriteSalesOrderSalesOrderHeaders(bucketHandle *storage.BucketHandle, softwareClientLicenseGuid string, timestamp int64) ([]*storage.ObjectHandle, *int64, *errortools.Error) {
 	if bucketHandle == nil {
 		return nil, nil, nil
 	}
@@ -244,7 +196,7 @@ func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketH
 	objectHandles := []*storage.ObjectHandle{}
 	var w *storage.Writer
 
-	call := service.SyncService().NewSyncSalesOrderSalesOrdersCall(&timestamp)
+	call := service.SyncService().NewSyncSalesOrderSalesOrderHeadersCall(&timestamp)
 
 	rowCount := 0
 	batchRowCount := 0
@@ -273,7 +225,7 @@ func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketH
 		for _, tl := range *transactionLines {
 			batchRowCount++
 
-			b, err := json.Marshal(getSalesOrderSalesOrder(&tl, softwareClientLicenseGuid, &maxTimestamp))
+			b, err := json.Marshal(getSalesOrderSalesOrderHeader(&tl, softwareClientLicenseGuid, &maxTimestamp))
 			if err != nil {
 				return nil, nil, errortools.ErrorMessage(err)
 			}
@@ -299,7 +251,7 @@ func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketH
 			}
 			w = nil
 
-			fmt.Printf("#SalesOrderSalesOrders flushed: %v\n", batchRowCount)
+			fmt.Printf("#SalesOrderSalesOrderHeaders flushed: %v\n", batchRowCount)
 
 			rowCount += batchRowCount
 			batchRowCount = 0
@@ -316,7 +268,7 @@ func (service *Service) WriteSalesOrderSalesOrders(bucketHandle *storage.BucketH
 		rowCount += batchRowCount
 	}
 
-	fmt.Printf("#SalesOrderSalesOrders: %v\n", rowCount)
+	fmt.Printf("#SalesOrderSalesOrderHeaders: %v\n", rowCount)
 
 	return objectHandles, &maxTimestamp, nil
 }
